@@ -1,0 +1,10 @@
+node_modules
+dist
+test-results
+test-results-training
+test-results-review
+playwright-report
+tests
+training-tests
+review-tests
+*.log

@@ -1,0 +1,52 @@
+name: zeros
+services:
+  backend:
+    build: ./backend
+    environment:
+      APP_MODE: ${APP_MODE:-LIVE_REAL_MONEY}
+      FEEDBACK_RELEASE: ${FEEDBACK_RELEASE:-SESSION_FINISHED}
+      FRAME_QUEUE_SIZE: ${FRAME_QUEUE_SIZE:-2}
+      CARD_TEMPLATE_DIR: ${CARD_TEMPLATE_DIR:-}
+      OCR_DECIMAL_SEPARATOR: ${OCR_DECIMAL_SEPARATOR:-.}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-zeros}:${POSTGRES_PASSWORD:-zeros_local_dev}@db:5432/${POSTGRES_DB:-zeros}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend/table_layouts:/app/table_layouts
+      - ./backend/card_templates:/app/card_templates:ro
+    ports:
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+  frontend:
+    build: ./frontend
+    ports:
+      - "127.0.0.1:5173:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-zeros}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-zeros_local_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-zeros}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  postgres_data:

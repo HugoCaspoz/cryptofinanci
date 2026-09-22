@@ -1,0 +1,47 @@
+.hand-panel {
+  margin-top: 22px;
+  padding: 24px;
+  min-width: 0;
+}
+.hand-panel .section-heading {
+  padding: 0;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.hand-panel p {
+  line-height: 1.6;
+}
+.saved-hands {
+  list-style: none;
+  padding: 0;
+}
+.saved-hands li {
+  border-bottom: 1px solid var(--border);
+  padding: 18px 0;
+  overflow-wrap: anywhere;
+}
+.saved-hands a {
+  color: var(--green);
+}
+.saved-hands small {
+  display: block;
+  color: var(--muted);
+  margin-top: 8px;
+}
+.hand-panel .poker-event-list small {
+  display: block;
+  color: var(--muted);
+  margin-top: 6px;
+  line-height: 1.6;
+}
+.hand-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+@media (max-width: 680px) {
+  .hand-panel {
+    padding: 20px;
+  }
+}

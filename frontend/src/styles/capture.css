@@ -1,0 +1,137 @@
+.capture-controls {
+  padding: 24px;
+  margin-bottom: 22px;
+}
+.capture-controls h2 {
+  margin-bottom: 7px;
+}
+.capture-controls p {
+  font-size: 12px;
+}
+.capture-options {
+  display: flex;
+  gap: 20px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+.capture-options label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #b8c5b0;
+  font-size: 11px;
+}
+.capture-options select,
+.capture-options input {
+  font: inherit;
+  color: #e4ecdf;
+  border: 1px solid #44523c;
+  border-radius: 6px;
+  padding: 11px;
+  background: #20291d;
+  max-width: 100%;
+  min-height: 42px;
+}
+.capture-options input {
+  width: 275px;
+}
+.capture-options input::file-selector-button {
+  background: #394b2c;
+  color: #d9e8cf;
+  border: 0;
+  border-radius: 3px;
+  padding: 3px 8px;
+  margin-right: 10px;
+  font: inherit;
+  cursor: pointer;
+}
+.capture-options select:focus-visible,
+.capture-options input:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+}
+.capture-options :disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.capture-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.capture-actions .button {
+  font-size: 11px;
+}
+.stop-button {
+  color: #e0baa5;
+  background: #32271f;
+  border-color: #5a4434;
+}
+.capture-help {
+  margin-top: 16px;
+}
+.capture-error {
+  color: #edb5a0;
+  margin-top: 13px;
+}
+.capture-preview {
+  background: #0c100d;
+  position: relative;
+  min-height: 310px;
+  display: grid;
+  place-items: center;
+}
+.capture-preview img {
+  width: 100%;
+  max-height: 560px;
+  object-fit: contain;
+  display: block;
+}
+.preview-badge {
+  justify-self: start;
+  margin: 10px 12px;
+  background: #161d16e8;
+  border: 1px solid #556447;
+  color: #d5dfc9;
+  padding: 8px 11px;
+  font-size: 10px;
+  border-radius: 4px;
+}
+.capture-source-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 50%;
+}
+@media (max-width: 680px) {
+  .capture-controls {
+    padding: 20px;
+  }
+  .capture-options {
+    gap: 15px;
+  }
+  .file-control {
+    min-width: 0;
+    width: 100%;
+  }
+  .capture-options input {
+    width: 100%;
+  }
+  .capture-actions {
+    width: 100%;
+  }
+  .capture-actions .button {
+    flex: 1 1 100%;
+  }
+  .video-footer {
+    flex-wrap: wrap;
+    gap: 9px;
+  }
+  .capture-preview {
+    min-height: 240px;
+  }
+  .connection-panel dl {
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,55 @@
+.preflop-panel input[type="number"],
+.preflop-panel textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 10px;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.preflop-panel textarea {
+  font-family: monospace;
+  resize: vertical;
+  margin: 8px 0;
+}
+.preflop-seats {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.preflop-seats label,
+.preflop-confirm {
+  display: flex;
+  align-items: start;
+  gap: 8px;
+}
+.preflop-confirm {
+  margin: 18px 0;
+}
+.preflop-table {
+  margin: 18px 0;
+}
+.preflop-table summary {
+  cursor: pointer;
+}
+.preflop-result {
+  margin: 20px 22px;
+  padding: 20px;
+  border: 1px solid var(--green);
+  border-radius: 8px;
+}
+.preflop-result > strong {
+  display: block;
+  font-size: 30px;
+  margin: 10px 0;
+  color: var(--green);
+}
+.preflop-result p {
+  font-size: 12px;
+  line-height: 1.7;
+}
+.preflop-result > span {
+  color: var(--muted);
+  font-size: 12px;
+}

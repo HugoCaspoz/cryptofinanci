@@ -1,0 +1,10 @@
+FROM zeros-backend:latest
+USER root
+COPY requirements-dev.txt .
+RUN pip install --no-cache-dir -r requirements-dev.txt
+COPY app ./app
+COPY tests ./tests
+COPY scripts ./scripts
+COPY pytest.ini .
+USER zeros
+CMD ["python", "-m", "pytest", "-q", "-o", "cache_dir=/tmp/zeros-pytest"]

@@ -1,0 +1,119 @@
+.strategy-panel details {
+  margin: 0 0 12px;
+}
+.strategy-panel details summary {
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+.strategy-panel details .button {
+  margin-top: 12px;
+}
+.strategy-check {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+.strategy-panel > div > .strategy-decision,
+.strategy-panel .strategy-decision {
+  margin: 0 22px 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.strategy-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 16px 22px;
+}
+.strategy-column {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.strategy-column h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+}
+.strategy-summary {
+  margin: 0 0 12px;
+  color: var(--green);
+}
+.strategy-column ul {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+}
+.strategy-column li {
+  margin-bottom: 12px;
+}
+.strategy-column li > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.strategy-bar {
+  display: block;
+  height: 6px;
+  margin: 4px 0;
+  min-width: 2px;
+  border-radius: 3px;
+  background: var(--green);
+}
+.strategy-column small,
+.strategy-footnote {
+  display: block;
+  color: var(--muted);
+}
+.strategy-adjustments {
+  margin: 0 22px 12px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.strategy-footnote {
+  margin: 0 22px;
+  font-size: 11px;
+  line-height: 1.6;
+}
+@media (max-width: 700px) {
+  .strategy-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.bluff-analysis {
+  margin: 16px 22px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.bluff-analysis h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+.bluff-analysis strong {
+  color: var(--green);
+}
+.bluff-grid {
+  display: grid;
+  margin: 12px 0;
+}
+.bluff-grid > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+.bluff-grid [role="rowheader"],
+.bluff-grid [role="columnheader"] {
+  color: var(--muted);
+}
+.bluff-analysis ul {
+  margin: 0;
+  padding-left: 18px;
+}

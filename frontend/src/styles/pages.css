@@ -1,0 +1,144 @@
+﻿.live-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  gap: 21px;
+}
+.video-panel {
+  background: #141916;
+}
+.video-panel .section-heading {
+  border-bottom: 1px solid var(--border);
+}
+.video-empty {
+  min-height: 310px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 25px;
+  background: radial-gradient(ellipse at center, #23302255, transparent 70%);
+}
+.empty-icon {
+  width: 66px;
+  height: 66px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #42533a;
+  border-radius: 19px;
+  background: #253020;
+  color: #bed2ab;
+  margin-bottom: 23px;
+}
+.video-empty h3 {
+  font-size: 20px;
+  font-weight: 550;
+  margin-bottom: 13px;
+}
+.video-empty p {
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+.video-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 22px;
+  border-top: 1px solid var(--border);
+  font-size: 10px;
+  color: #82917b;
+}
+.video-footer > span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.video-footer i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #788970;
+}
+.video-footer b {
+  margin: 0 9px;
+}
+.connection-panel {
+  padding: 23px;
+}
+.connection-panel .eyebrow {
+  font-size: 8px;
+}
+.connection-panel h2 {
+  font-size: 23px;
+  margin-bottom: 15px;
+}
+.connection-panel dl {
+  margin: 25px 0;
+}
+.connection-panel dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 19px 0;
+  font-size: 10px;
+}
+.connection-panel dt {
+  color: #92a089;
+}
+.connection-panel dd {
+  margin: 0;
+  color: #c7d0c1;
+  text-align: right;
+}
+.connection-panel .button {
+  width: 100%;
+  font-size: 11px;
+  gap: 9px;
+}
+.mode-note {
+  display: flex;
+  gap: 10px;
+  margin-top: 23px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  color: #9fb889;
+}
+.mode-note p {
+  font-size: 10px;
+}
+.mode-note p span {
+  display: block;
+  margin-top: 7px;
+  color: #a4b396;
+}
+.live-events {
+  margin-top: 23px;
+}
+.live-events .event-log {
+  padding-bottom: 16px;
+}
+.empty-state {
+  min-height: 390px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 45px 25px;
+}
+.empty-state h2 {
+  font-size: 25px;
+}
+.empty-state p {
+  max-width: 430px;
+  margin: 15px 0 25px;
+  font-size: 13px;
+}
+.error-state {
+  padding: 30px;
+}
+.error-state p {
+  margin: 12px 0 20px;
+}
+.back-link {
+  margin-bottom: 22px;
+}

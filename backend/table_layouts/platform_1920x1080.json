@@ -1,0 +1,197 @@
+{
+  "version": 1,
+  "platform": "Zeros demo",
+  "width": 1920,
+  "height": 1080,
+  "calibrated": false,
+  "regions": {
+    "hero_cards": {
+      "x": 850,
+      "y": 780,
+      "width": 220,
+      "height": 110
+    },
+    "board": {
+      "x": 650,
+      "y": 440,
+      "width": 620,
+      "height": 130
+    },
+    "pot": {
+      "x": 820,
+      "y": 610,
+      "width": 280,
+      "height": 50
+    },
+    "dealer_button": {
+      "x": 1150,
+      "y": 780,
+      "width": 70,
+      "height": 70
+    },
+    "blinds": {
+      "x": 40,
+      "y": 1010,
+      "width": 310,
+      "height": 40
+    }
+  },
+  "players": [
+    {
+      "nickname": {
+        "x": 820,
+        "y": 915,
+        "width": 240,
+        "height": 36
+      },
+      "stack": {
+        "x": 820,
+        "y": 957,
+        "width": 240,
+        "height": 36
+      },
+      "bet": {
+        "x": 820,
+        "y": 690,
+        "width": 160,
+        "height": 40
+      },
+      "action": {
+        "x": 820,
+        "y": 738,
+        "width": 240,
+        "height": 36
+      }
+    },
+    {
+      "nickname": {
+        "x": 230,
+        "y": 700,
+        "width": 240,
+        "height": 36
+      },
+      "stack": {
+        "x": 230,
+        "y": 742,
+        "width": 240,
+        "height": 36
+      },
+      "bet": {
+        "x": 230,
+        "y": 590,
+        "width": 160,
+        "height": 40
+      },
+      "action": {
+        "x": 230,
+        "y": 638,
+        "width": 240,
+        "height": 36
+      }
+    },
+    {
+      "nickname": {
+        "x": 230,
+        "y": 190,
+        "width": 240,
+        "height": 36
+      },
+      "stack": {
+        "x": 230,
+        "y": 232,
+        "width": 240,
+        "height": 36
+      },
+      "bet": {
+        "x": 230,
+        "y": 290,
+        "width": 160,
+        "height": 40
+      },
+      "action": {
+        "x": 230,
+        "y": 340,
+        "width": 240,
+        "height": 36
+      }
+    },
+    {
+      "nickname": {
+        "x": 820,
+        "y": 90,
+        "width": 240,
+        "height": 36
+      },
+      "stack": {
+        "x": 820,
+        "y": 132,
+        "width": 240,
+        "height": 36
+      },
+      "bet": {
+        "x": 820,
+        "y": 190,
+        "width": 160,
+        "height": 40
+      },
+      "action": {
+        "x": 820,
+        "y": 240,
+        "width": 240,
+        "height": 36
+      }
+    },
+    {
+      "nickname": {
+        "x": 1450,
+        "y": 190,
+        "width": 240,
+        "height": 36
+      },
+      "stack": {
+        "x": 1450,
+        "y": 232,
+        "width": 240,
+        "height": 36
+      },
+      "bet": {
+        "x": 1450,
+        "y": 290,
+        "width": 160,
+        "height": 40
+      },
+      "action": {
+        "x": 1450,
+        "y": 340,
+        "width": 240,
+        "height": 36
+      }
+    },
+    {
+      "nickname": {
+        "x": 1450,
+        "y": 700,
+        "width": 240,
+        "height": 36
+      },
+      "stack": {
+        "x": 1450,
+        "y": 742,
+        "width": 240,
+        "height": 36
+      },
+      "bet": {
+        "x": 1450,
+        "y": 590,
+        "width": 160,
+        "height": 40
+      },
+      "action": {
+        "x": 1450,
+        "y": 638,
+        "width": 240,
+        "height": 36
+      }
+    }
+  ]
+}

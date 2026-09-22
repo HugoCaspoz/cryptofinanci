@@ -1,0 +1,31 @@
+{
+  "name": "zeros-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "playwright test",
+    "test:training": "playwright test -c playwright.training.config.ts",
+    "test:review": "playwright test -c playwright.review.config.ts",
+    "format": "prettier --write src tests training-tests review-tests *.ts *.json index.html",
+    "format:check": "prettier --check src tests training-tests review-tests *.ts *.json index.html"
+  },
+  "dependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router": "^8.4.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^22.20.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "prettier": "^3.9.7",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.0"
+  }
+}

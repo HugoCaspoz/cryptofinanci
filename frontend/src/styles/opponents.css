@@ -1,0 +1,194 @@
+.opponent-panel {
+  margin-top: 20px;
+}
+.decision-panel {
+  margin-top: 20px;
+}
+.decision-list {
+  list-style: none;
+  padding: 0;
+}
+.decision-list li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0;
+}
+.decision-detail {
+  border-top: 1px solid var(--border);
+  margin: 0 22px;
+  padding: 14px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.decision-detail details {
+  margin: 14px 0;
+}
+.decision-evaluation {
+  margin-top: 20px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+.evaluation-comparisons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+}
+.evaluation-comparisons article {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+}
+.review-panel {
+  margin-top: 22px;
+  overflow-wrap: anywhere;
+}
+.review-panel form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+}
+.review-panel > button {
+  margin: 12px 0;
+}
+.opponent-body {
+  padding: 0 22px 22px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.opponent-body form {
+  margin: 18px 0;
+}
+.opponent-body fieldset {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.opponent-seats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+.opponent-confirm {
+  display: block;
+  margin: 14px 0;
+}
+.opponent-body select {
+  padding: 8px;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.opponent-body details {
+  margin: 16px 0;
+}
+.opponent-body details label {
+  display: block;
+  margin: 10px 0;
+}
+.opponent-body details input {
+  display: block;
+  width: 100%;
+  max-width: 350px;
+  box-sizing: border-box;
+  padding: 8px;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.adaptive-range {
+  border-top: 1px solid var(--border);
+  overflow-wrap: anywhere;
+}
+.tournament-fields {
+  margin-top: 16px;
+}
+.tournament-fields > label {
+  display: block;
+  margin: 14px 0;
+}
+.tournament-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+  margin: 14px 0;
+}
+.tournament-grid label {
+  min-width: 0;
+}
+.tournament-grid input,
+.tournament-grid select {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.tournament-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.tournament-summary {
+  border: 1px solid var(--border);
+  padding: 14px;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+.opponent-profiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+.opponent-card {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.opponent-card h3 {
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+.opponent-card h3 small {
+  font-weight: 400;
+}
+.opponent-card small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+.opponent-card dl {
+  margin: 0;
+}
+.opponent-card dl > div {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  gap: 8px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+.opponent-card dd {
+  margin: 0;
+}
+.opponent-outcomes {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+@media (max-width: 400px) {
+  .opponent-profiles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
