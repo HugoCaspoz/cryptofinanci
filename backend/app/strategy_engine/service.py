@@ -52,6 +52,8 @@ class PreflopService:
                 or any(b.sequence != a.sequence + 1 for a, b in zip(selected, selected[1:]))):
             self.history_error = "Faltan eventos desde la confirmación del historial; vuelve a confirmar el contexto."
         for event in selected:
+            if event.type in {"MANUAL_CORRECTION", "ANALYSIS_RESUMED"}:
+                self.history_error = "Se ha corregido o pausado la observación; vuelve a confirmar el contexto."
             if (event.scope_id != state.scope_id or timestamp is None or frame_id is None
                     or event.timestamp > timestamp or event.frame_id > frame_id):
                 self.history_error = "Evento de otra captura o posterior al estado que se está evaluando."

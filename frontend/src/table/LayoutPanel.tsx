@@ -1,7 +1,16 @@
 import { regionEntries, validLayout, type Region } from "./types";
 import type { LayoutEditorState } from "./useTableLayout";
+import { useCapture } from "../capture/CaptureProvider";
+import { CardProfiles } from "./CardProfiles";
 
 export function LayoutPanel({ editor }: { editor: LayoutEditorState }) {
+  const { capture, stop } = useCapture();
+  const frame = capture.frame;
+  const activeRevision = capture.observation_state.cards?.layout_revision;
+  const needsRestart =
+    capture.state === "running" &&
+    activeRevision &&
+    activeRevision !== editor.revision;
   const { layout, busy, error, message, enabled, labels, selected, dirty } =
     editor;
   const entries = layout ? regionEntries(layout) : [];
@@ -24,9 +33,33 @@ export function LayoutPanel({ editor }: { editor: LayoutEditorState }) {
         </span>
       </div>
       <p>
-        Un layout de 1920 × 1080 y 6 asientos. Ajusta cada rectángulo sobre una
-        captura de la mesa completa, sin bordes ni paneles adicionales.
+        Layout de {layout?.width ?? 1920} × {layout?.height ?? 1080} y hasta 6
+        asientos. Ajusta cada rectángulo sobre una captura de la mesa completa,
+        sin bordes ni paneles adicionales.
       </p>
+      <CardProfiles editor={editor} />
+      {frame &&
+        layout &&
+        (frame.width !== layout.width || frame.height !== layout.height) && (
+          <p role="alert">
+            La resolución de la fuente es {frame.width} × {frame.height}.{" "}
+            <button
+              className="button secondary"
+              onClick={() => editor.fitFrame(frame.width, frame.height)}
+            >
+              Adaptar regiones a la imagen
+            </button>
+          </p>
+        )}
+      {needsRestart && (
+        <p role="status">
+          El detector sigue usando la calibración anterior.{" "}
+          <button className="button secondary" onClick={() => void stop()}>
+            Detener para aplicar la calibración
+          </button>{" "}
+          Después vuelve a conectar la fuente.
+        </p>
+      )}
       <div className="layout-toggles">
         <label>
           <input
@@ -88,7 +121,9 @@ export function LayoutPanel({ editor }: { editor: LayoutEditorState }) {
                 type="number"
                 step="1"
                 min={key === "x" || key === "y" ? 0 : 1}
-                max={key === "x" || key === "width" ? 1920 : 1080}
+                max={
+                  key === "x" || key === "width" ? layout.width : layout.height
+                }
                 value={Number.isFinite(region[key]) ? region[key] : ""}
                 onChange={(e) =>
                   editor.updateRegion(key, e.target.valueAsNumber)
@@ -110,8 +145,8 @@ export function LayoutPanel({ editor }: { editor: LayoutEditorState }) {
       )}
       {!valid && layout && (
         <p className="capture-error">
-          Introduce un nombre y rectángulos con píxeles enteros dentro de 1920 ×
-          1080.
+          Introduce un nombre y rectángulos con píxeles enteros dentro del
+          tamaño de la imagen.
         </p>
       )}
       <div className="layout-actions">

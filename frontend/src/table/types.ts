@@ -2,9 +2,10 @@ export type Region = { x: number; y: number; width: number; height: number };
 export type TableLayout = {
   version: 1;
   platform: string;
-  width: 1920;
-  height: 1080;
+  width: number;
+  height: number;
   calibrated: boolean;
+  card_profile?: string | null;
   regions: Record<
     "hero_cards" | "board" | "pot" | "dealer_button" | "blinds",
     Region

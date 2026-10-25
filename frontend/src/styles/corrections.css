@@ -1,0 +1,48 @@
+.manual-correction summary {
+  cursor: pointer;
+  padding: 1.2rem;
+}
+.correction-body {
+  padding: 0 1.2rem 1.2rem;
+  display: grid;
+  gap: 1rem;
+}
+.correction-body form,
+.correction-body fieldset {
+  min-width: 0;
+  display: grid;
+  gap: 1rem;
+}
+.correction-body fieldset {
+  border: 1px solid var(--border);
+  padding: 1rem;
+}
+.correction-body .correction-player {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+}
+.correction-body label {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+}
+.correction-body input,
+.correction-body select {
+  width: 100%;
+  min-width: 0;
+}
+
+.correction-body input,
+.correction-body select {
+  padding: 10px;
+  min-height: 42px;
+  font: inherit;
+  color: #e9eee8;
+  background: #141a15;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.correction-body input:focus-visible,
+.correction-body select:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}

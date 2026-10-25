@@ -1,6 +1,9 @@
+import { useSearchParams } from "react-router";
+import { ExplanationPanel } from "../explanations/ExplanationPanel";
 import { useEffect, useState } from "react";
 import { useCapture } from "../capture/CaptureProvider";
 import { readResponse } from "../capture/types";
+import "./timeline.css";
 import type { DecisionSummary, DecisionDetail } from "../decisions/types";
 import { EvaluationReview } from "../decisions/EvaluationReview";
 
@@ -11,7 +14,53 @@ type Access = {
   session: { scope_id: string; status: string; release_policy: string } | null;
 };
 
-function FrozenReview({ identity }: { identity: string }) {
+function DecisionFrame({ identity }: { identity: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    let objectUrl: string | null = null;
+    fetch(`/api/decisions/${identity}/frame`, { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) {
+          await readResponse(response);
+          throw new Error("No se pudo cargar el fotograma.");
+        }
+        return response.blob();
+      })
+      .then((blob) => {
+        if (controller.signal.aborted) return;
+        objectUrl = URL.createObjectURL(blob);
+        setUrl(objectUrl);
+      })
+      .catch((e) => {
+        if (!controller.signal.aborted) setError(e.message);
+      });
+    return () => {
+      controller.abort();
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [identity]);
+  return url ? (
+    <img
+      className="decision-frame"
+      src={url}
+      alt="Fotograma del turno confirmado de Hero"
+    />
+  ) : (
+    <p role={error ? "status" : undefined}>
+      {error ?? "Cargando fotograma..."}
+    </p>
+  );
+}
+
+function FrozenReview({
+  identity,
+  handId,
+}: {
+  identity: string;
+  handId?: string;
+}) {
   const [data, setData] = useState<DecisionDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
@@ -19,13 +68,17 @@ function FrozenReview({ identity }: { identity: string }) {
     fetch(`/api/decisions/${identity}`, { signal: controller.signal })
       .then(readResponse<DecisionDetail>)
       .then((value) => {
-        if (!controller.signal.aborted) setData(value);
+        if (!controller.signal.aborted) {
+          if (handId && value.hand_id !== handId)
+            throw new Error("La decisi\u00f3n no pertenece a esta mano.");
+          setData(value);
+        }
       })
       .catch((e) => {
         if (!controller.signal.aborted) setError(e.message);
       });
     return () => controller.abort();
-  }, [identity]);
+  }, [identity, handId]);
   return (
     <>
       {error ? (
@@ -38,10 +91,58 @@ function FrozenReview({ identity }: { identity: string }) {
             {data.request.state.board.join(" ") || "Preflop"} · Bote:{" "}
             {data.request.state.pot}
           </p>
+          <DecisionFrame key={identity} identity={identity} />
+          <details>
+            <summary>Estado de juego congelado</summary>
+            <p>
+              Ciegas: {data.request.state.small_blind ?? "?"} /{" "}
+              {data.request.state.big_blind ?? "?"}{" "}
+              {data.request.state.blinds_unit ?? ""} · Turno:{" "}
+              {data.request.state.current_player ?? "Desconocido"}
+            </p>
+            <div className="decision-state">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Asiento</th>
+                    <th>Jugador</th>
+                    <th>Stack</th>
+                    <th>Apuesta</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.request.state.players.map((player) => (
+                    <tr key={player.player_id}>
+                      <td>{player.seat}</td>
+                      <td>{player.nickname ?? player.player_id}</td>
+                      <td>
+                        {player.stack ?? "?"} {player.stack_unit ?? ""}
+                      </td>
+                      <td>
+                        {player.current_bet ?? "?"} {player.bet_unit ?? ""}
+                      </td>
+                      <td>
+                        {player.folded
+                          ? "Fold"
+                          : player.all_in
+                            ? "All-in"
+                            : "En juego"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </details>
           {!data.history_complete && (
             <p>Historial parcial: pueden faltar acciones anteriores.</p>
           )}
           <EvaluationReview identity={identity} accessGranted detailed />
+          <ExplanationPanel
+            key={`explanation:${identity}`}
+            identity={identity}
+          />
         </article>
       ) : (
         <p>Cargando decisión…</p>
@@ -51,8 +152,10 @@ function FrozenReview({ identity }: { identity: string }) {
 }
 
 function Decisions({ handId }: { handId: string }) {
+  const [params] = useSearchParams();
+  const linkedDecision = params.get("decision");
   const [after, setAfter] = useState(0);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(linkedDecision);
   const [data, setData] = useState<{
     items: DecisionSummary[];
     has_more: boolean;
@@ -63,7 +166,7 @@ function Decisions({ handId }: { handId: string }) {
     const controller = new AbortController();
     setData(null);
     setError(null);
-    setSelected(null);
+    setSelected(linkedDecision);
     fetch(
       `/api/decisions?hand_id=${encodeURIComponent(handId)}&after=${after}`,
       { signal: controller.signal },
@@ -76,7 +179,7 @@ function Decisions({ handId }: { handId: string }) {
         if (!controller.signal.aborted) setError(e.message);
       });
     return () => controller.abort();
-  }, [handId, after]);
+  }, [handId, after, linkedDecision]);
   return (
     <>
       {error && <p role="alert">{error}</p>}
@@ -85,7 +188,12 @@ function Decisions({ handId }: { handId: string }) {
           {data.items.length === 0 && (
             <p>No hay instantáneas de decisión guardadas para esta mano.</p>
           )}
-          <ul className="decision-list">
+          <h3>Línea temporal de decisiones</h3>
+          <p>
+            El indicador describe la diferencia de EV estimada frente al menú
+            baseline; no es una nota de acierto.
+          </p>
+          <ol className="decision-list decision-timeline">
             {data.items.map((item) => (
               <li key={item.id}>
                 <button
@@ -94,10 +202,23 @@ function Decisions({ handId }: { handId: string }) {
                   onClick={() => setSelected(item.id)}
                 >
                   Revisar {item.street} · {item.timestamp.toFixed(1)} s
+                  <span>
+                    {item.actual_action?.action ?? "Sin acción evaluada"} ·{" "}
+                    {item.ev_difference_bb == null
+                      ? item.evaluation_status === "pending"
+                        ? "Evaluación pendiente"
+                        : "Sin EV comparable"
+                      : `${item.ev_difference_bb.toFixed(2)} BB estimadas`}
+                  </span>
+                  <span>
+                    {item.frame_available
+                      ? "Fotograma guardado"
+                      : "Sin fotograma"}
+                  </span>
                 </button>
               </li>
             ))}
-          </ul>
+          </ol>
           {after > 0 && (
             <button className="button secondary" onClick={() => setAfter(0)}>
               Primeras decisiones
@@ -111,7 +232,9 @@ function Decisions({ handId }: { handId: string }) {
               Siguientes decisiones
             </button>
           )}
-          {selected && <FrozenReview key={selected} identity={selected} />}
+          {selected && (
+            <FrozenReview key={selected} identity={selected} handId={handId} />
+          )}
         </>
       )}
     </>

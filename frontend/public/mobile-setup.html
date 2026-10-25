@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zeros · Acceso desde el móvil</title>
+    <style>
+      body {
+        font: 17px/1.65 system-ui;
+        background: #101711;
+        color: #ecf0e9;
+        max-width: 760px;
+        margin: 40px auto;
+        padding: 0 24px;
+      }
+      a {
+        color: #c5f47b;
+      }
+      pre {
+        padding: 18px;
+        background: #20281f;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      li {
+        margin: 16px 0;
+      }
+      h1,
+      h2 {
+        line-height: 1.2;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/live">← Volver al directo</a>
+    <h1>La cámara de tu móvil, conectada a Zeros</h1>
+    <p>
+      El móvil envía imágenes al ordenador, donde se ejecuta el análisis. No se
+      solicita micrófono. Ambos dispositivos deben estar en la misma red local.
+    </p>
+    <h2>Si usas la app desplegada en Railway</h2>
+    <p>
+      Abre directamente su dirección HTTPS e introduce las credenciales de
+      acceso. No necesitas instalar certificados locales, compartir Wi-Fi con el
+      ordenador ni mantener Docker encendido. En En directo, pulsa
+      <strong>Usar cámara</strong>. Las instrucciones de red local que siguen
+      solo se aplican cuando ejecutas la app en tu ordenador.
+    </p>
+    <h2>Preparar el ordenador para acceso local</h2>
+    <p>
+      Con Docker Desktop iniciado, ejecuta en PowerShell desde la carpeta del
+      proyecto:
+    </p>
+    <pre>powershell -ExecutionPolicy Bypass -File scripts/Start-Mobile.ps1</pre>
+    <p>
+      El script muestra la dirección de la app. Abre
+      <code>.mobile/access.txt</code> en el ordenador para ver la contraseña y
+      las direcciones específicas de tu red. Si no conecta desde el móvil,
+      ejecuta una vez PowerShell como administrador:
+    </p>
+    <pre>
+powershell -ExecutionPolicy Bypass -File scripts/Start-Mobile.ps1 -ConfigureFirewall</pre>
+    <h2>Conectar el móvil</h2>
+    <ol>
+      <li>
+        Descarga el certificado desde la dirección HTTP que figura en el archivo
+        de acceso. Instala únicamente el certificado generado por tu propia
+        instalación.
+      </li>
+      <li>
+        <strong>iPhone:</strong> abre Ajustes → Perfil descargado e instala el
+        perfil. Después, General → Información → Ajustes de confianza de
+        certificados: activa la confianza de esta autoridad local.<br /><strong
+          >Android:</strong
+        >
+        busca Instalar certificado → Certificado de CA en los ajustes de
+        seguridad. El nombre del menú y la confianza del navegador varían según
+        el fabricante.
+      </li>
+      <li>
+        Abre la dirección HTTPS del archivo de acceso. Introduce el usuario
+        <strong>zeros</strong> y la contraseña guardada allí. La conexión debe
+        aparecer segura; continuar a pesar de un error de certificado no
+        sustituye la instalación de confianza.
+      </li>
+      <li>
+        En En directo, pulsa <strong>Usar cámara</strong> y permite su uso. Se
+        prefiere la cámara trasera; puedes elegir la frontal antes de iniciar.
+      </li>
+    </ol>
+    <h2>Encuadrar la mesa</h2>
+    <p>
+      Coloca el móvil en horizontal y fijo, frente al monitor. Una sola mesa,
+      sin reflejos y con texto legible. Usa la previsualización recibida para
+      ajustar las regiones de cartas y números en la configuración de la mesa.
+      Si mueves el móvil o cambias la orientación, detén la captura y calibra de
+      nuevo.
+    </p>
+    <p>
+      Mantén la pestaña visible y el móvil desbloqueado. Se solicita mantener la
+      pantalla encendida si el navegador lo permite. Ocultar la pestaña detiene
+      la cámara; si se pierde la conexión, el servidor deja de capturar tras 15
+      segundos sin imágenes.
+    </p>
+    <p>
+      Detener captura libera la cámara. Puedes detenerla también desde la app en
+      el ordenador. No abras los puertos del router: el acceso está preparado
+      para una red local. Si cambia la IP del ordenador, ejecuta otra vez el
+      script. Puedes retirar el certificado del móvil cuando dejes de usar esta
+      instalación.
+    </p>
+    <p>
+      La cámara funciona como entrada de vídeo; su precisión sobre una mesa real
+      todavía debe validarse. En dinero real se mantienen las restricciones de
+      revisión posteriores a la sesión.
+    </p>
+  </body>
+</html>

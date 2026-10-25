@@ -1,4 +1,5 @@
 export type FieldEvidence = {
+  source?: string;
   status: string;
   confidence: number;
   confirmed_frame_id: number | null;
@@ -11,6 +12,7 @@ export type PlayerState = {
   seat: number;
   nickname: string | null;
   position: string | null;
+  observed_action?: string | null;
   stack: string | null;
   stack_unit: string | null;
   current_bet: string | null;

@@ -9,6 +9,8 @@ from app.capture_engine.source import Frame
 from app.card_detector.models import CardObservation
 from app.card_detector.detector import CardDetector
 from app.card_detector.templates import TemplateDeck
+from app.card_detector.profiles import CardProfiles
+import os
 from app.table_detector.store import LayoutStore
 from app.ocr_engine.engine import OcrEngine
 from app.ocr_engine.models import OcrObservation
@@ -50,7 +52,11 @@ class VisionEngine:
         self.ocr = OcrEngine(self.layout, self.revision, tesseract_cmd, decimal_separator)
         self.actions = ActionVision(self.layout, self.revision)
         try:
-            deck = TemplateDeck.load(Path(template_dir) if template_dir else None)
+            directory = Path(template_dir) if template_dir else None
+            if self.layout.card_profile:
+                root = os.getenv("CARD_PROFILE_ROOT", str(layouts.path.parent / "card_profiles"))
+                directory = CardProfiles(root).resolve(self.layout.card_profile)
+            deck = TemplateDeck.load(directory)
         except (OSError, ValueError, cv2.error) as exc:
             logging.getLogger(__name__).warning("Card references unavailable: %s", exc)
             self.status = "templates_unavailable"

@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from time import monotonic
 
 import cv2
 
@@ -11,6 +12,7 @@ class ProcessedFrame:
     metadata: dict
     jpeg: bytes
     observation: VisionObservation
+    timings: dict = field(default_factory=dict)
 
 
 class FrameProcessor:
@@ -18,7 +20,9 @@ class FrameProcessor:
         self.vision = vision or VisionEngine()
 
     def process(self, frame: Frame) -> ProcessedFrame:
+        started = monotonic()
         observation = self.vision.observe(frame)
+        observed_at = monotonic()
         image = frame.image
         height, width = image.shape[:2]
         if width > 1280 or height > 720:
@@ -33,5 +37,6 @@ class FrameProcessor:
             "fps": frame.fps,
             "width": int(width),
             "height": int(height),
-        }, encoded.tobytes(), observation)
+        }, encoded.tobytes(), observation, {"vision": (observed_at - started) * 1000,
+            "preview": (monotonic() - observed_at) * 1000})
 

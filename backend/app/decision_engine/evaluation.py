@@ -22,7 +22,7 @@ def resolve_action(snapshot, events, ended=False, truncated=False):
         kind, after = event["type"], event["state_after"]
         if (event["hand_id"] != snapshot["hand_id"] or after["street"] != state["street"]
                 or after["board"] != state["board"]
-                or kind in {"HAND_STARTED", "HAND_FINISHED", "CAPTURE_ENDED", "HERO_DECISION_REQUIRED"}):
+                or kind in {"HAND_STARTED", "HAND_FINISHED", "CAPTURE_ENDED", "HERO_DECISION_REQUIRED", "MANUAL_CORRECTION", "ANALYSIS_RESUMED"}):
             return {"link_status": "unavailable", "reason": "El turno terminó o cambió antes de observar una acción inequívoca de Hero.", "actual_event": None}
         if kind.startswith("PLAYER_"):
             if (event["player_id"] != hero["player_id"] or event["frame_id"] < snapshot["frame_id"]

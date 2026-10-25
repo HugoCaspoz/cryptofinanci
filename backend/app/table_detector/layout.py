@@ -32,14 +32,17 @@ class PlayerRegions(StrictModel):
 class TableLayout(StrictModel):
     version: Literal[1] = 1
     platform: str = Field(min_length=1, max_length=80, pattern=r"\S")
-    width: Literal[1920]
-    height: Literal[1080]
+    width: int = Field(ge=320, le=3840, strict=True)
+    height: int = Field(ge=240, le=2160, strict=True)
     calibrated: bool = Field(strict=True)
+    card_profile: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     regions: TableRegions
     players: list[PlayerRegions] = Field(min_length=6, max_length=6)
 
     @model_validator(mode="after")
     def check_bounds(self):
+        if self.width * self.height > 3840 * 2160:
+            raise ValueError("La resolución supera el límite de la captura.")
         groups = [self.regions, *self.players]
         for group in groups:
             for name in type(group).model_fields:

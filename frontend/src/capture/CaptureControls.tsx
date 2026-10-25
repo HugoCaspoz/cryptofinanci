@@ -2,10 +2,19 @@ import { useState } from "react";
 import { useCapture } from "./CaptureProvider";
 
 export function CaptureControls() {
-  const { capture, busy, error, available, startFile, startScreen, stop } =
-    useCapture();
-  const [fps, setFps] = useState(5);
+  const {
+    capture,
+    busy,
+    error,
+    available,
+    startFile,
+    startScreen,
+    startCamera,
+    stop,
+  } = useCapture();
+  const [fps, setFps] = useState(0);
   const [file, setFile] = useState<File | null>(null);
+  const [facing, setFacing] = useState<"environment" | "user">("environment");
   const running = capture.state === "running";
   const disabled = busy || running || !available;
   return (
@@ -13,7 +22,7 @@ export function CaptureControls() {
       <div>
         <span className="eyebrow">FUENTE DE VÍDEO</span>
         <h2>Conecta tu mesa</h2>
-        <p>Un archivo para practicar o una ventana para observar.</p>
+        <p>Conecta un archivo, una ventana o la cámara de tu móvil.</p>
       </div>
       <div className="capture-options">
         <label className="fps-control">
@@ -23,6 +32,7 @@ export function CaptureControls() {
             disabled={disabled}
             onChange={(event) => setFps(Number(event.target.value))}
           >
+            <option value={0}>Inteligente: 2 / 10 FPS</option>
             {[1, 2, 5, 10, 15].map((value) => (
               <option key={value} value={value}>
                 {value} FPS
@@ -40,6 +50,27 @@ export function CaptureControls() {
           />
         </label>
         <div className="capture-actions">
+          <label>
+            Cámara
+            <select
+              aria-label="Cámara"
+              value={facing}
+              disabled={disabled}
+              onChange={(event) =>
+                setFacing(event.target.value as "environment" | "user")
+              }
+            >
+              <option value="environment">Trasera (recomendada)</option>
+              <option value="user">Frontal</option>
+            </select>
+          </label>
+          <button
+            className="button primary"
+            disabled={disabled}
+            onClick={() => void startCamera(fps, facing)}
+          >
+            Usar cámara
+          </button>
           <button
             className="button primary"
             disabled={disabled || !file}
@@ -68,6 +99,20 @@ export function CaptureControls() {
         {running
           ? "La captura continúa al navegar entre páginas."
           : "El archivo se sube antes de iniciar su reproducción."}
+      </p>
+      <p className="capture-help">
+        Cámara: coloca el móvil fijo y en horizontal, con una sola mesa de
+        frente y sin reflejos. Mantén esta pestaña visible; la cámara se detiene
+        al ocultarla o bloquear el móvil. Ajusta las regiones de la mesa sobre
+        la imagen recibida. Desde otro dispositivo necesitas HTTPS.{" "}
+        <a
+          className="text-link"
+          href="/mobile-setup.html"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Configurar acceso desde el móvil
+        </a>
       </p>
       {busy && <p role="status">Preparando la fuente…</p>}
       {!available && (

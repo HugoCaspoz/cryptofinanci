@@ -1,0 +1,31 @@
+# Optional LAN gateway. Start with scripts/Start-Mobile.ps1.
+services:
+  mobile:
+    image: caddy:2-alpine
+    profiles: [mobile]
+    ports:
+      - "${MOBILE_BIND_IP:?Run scripts/Start-Mobile.ps1}:5443:443"
+      - "${MOBILE_BIND_IP:?Run scripts/Start-Mobile.ps1}:5444:8080"
+    environment:
+      MOBILE_HOST: ${MOBILE_BIND_IP}
+      MOBILE_AUTH_HASH: ${MOBILE_AUTH_HASH:?Run scripts/Start-Mobile.ps1}
+    volumes:
+      - ./infra/mobile/Caddyfile:/etc/caddy/Caddyfile:ro
+      - mobile_caddy_data:/data
+      - mobile_caddy_config:/config
+    depends_on:
+      frontend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:2019/config/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+volumes:
+  mobile_caddy_data:
+  mobile_caddy_config:

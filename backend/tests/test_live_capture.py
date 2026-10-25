@@ -100,7 +100,9 @@ def test_blocked_socket_times_out_without_retaining_subscriber(monkeypatch):
     hub.publish({"revision": 1})
 
     class SlowSocket:
-        app = SimpleNamespace(state=SimpleNamespace(capture_hub=hub, settings=SimpleNamespace(mode="TRAINING")))
+        headers = {}
+        cookies = {}
+        app = SimpleNamespace(state=SimpleNamespace(capture_hub=hub, settings=SimpleNamespace(mode="TRAINING"), sessions=SimpleNamespace(valid=lambda token: True)))
         received = False
         code = None
 

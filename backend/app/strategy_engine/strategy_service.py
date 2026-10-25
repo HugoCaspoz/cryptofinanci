@@ -38,9 +38,10 @@ def archived_input(request):
 
 
 class StrategyService:
-    def __init__(self, mode, on_update, store=None, engine=None):
+    def __init__(self, mode, on_update, store=None, engine=None, on_timing=None):
         self.mode, self.on_update, self.store = mode, on_update, store
         self.engine = engine or StrategyEngine()
+        self.on_timing = on_timing
         self.config = StrategyConfig()  # Sizing preferences survive captures; hand facts never do.
         self.task = None
         self.generation = 0
@@ -122,6 +123,8 @@ class StrategyService:
                     result["decision_snapshot_id"] = request.snapshot_id
                     result["id"], self.pending_record = self.record(request, result)
                     await self.flush()
+                    if self.on_timing:
+                        self.on_timing(request.state.scope_id, request.frame_id, "strategy", result["analysis_latency_ms"])
                 except Exception:
                     logger.exception("Strategy archive failed")
                     if generation == self.generation:

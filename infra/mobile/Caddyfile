@@ -1,0 +1,32 @@
+{
+    auto_https disable_redirects
+    skip_install_trust
+    default_sni {$MOBILE_HOST}
+}
+
+https://{$MOBILE_HOST} {
+    tls internal
+    basic_auth {
+        zeros {$MOBILE_AUTH_HASH}
+    }
+    header {
+        Permissions-Policy "camera=(self), microphone=(), display-capture=(self)"
+        Referrer-Policy "same-origin"
+    }
+    reverse_proxy frontend:80
+}
+
+# Public certificate only, to install trust before opening the HTTPS app.
+# Neither the app nor any private key is served on this HTTP port.
+http://{$MOBILE_HOST}:8080 {
+    @certificate path /zeros-root.crt
+    handle @certificate {
+        root * /data/caddy/pki/authorities/local
+        rewrite * /root.crt
+        header Content-Type application/x-x509-ca-cert
+        file_server
+    }
+    handle {
+        respond "Descarga el certificado en /zeros-root.crt y abre la app por HTTPS en el puerto 5443." 404
+    }
+}

@@ -56,7 +56,8 @@ export function Preview({ editor }: { editor: LayoutEditorState }) {
       } catch {
         if (!disposed) setError(true);
       }
-      if (!disposed) timer = setTimeout(poll, 1000 / capture.capture_fps);
+      if (!disposed && capture.state === "running")
+        timer = setTimeout(poll, Math.max(100, 1000 / capture.capture_fps));
     }
     if (capture.capture_id && active) void poll();
     return () => {
@@ -65,7 +66,7 @@ export function Preview({ editor }: { editor: LayoutEditorState }) {
       clearTimeout(timer);
       if (currentUrl) URL.revokeObjectURL(currentUrl);
     };
-  }, [capture.capture_id, capture.capture_fps, active]);
+  }, [capture.capture_id, capture.capture_fps, capture.state, active]);
 
   return (
     <div className="capture-preview">

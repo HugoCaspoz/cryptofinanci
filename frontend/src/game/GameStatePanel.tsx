@@ -39,7 +39,7 @@ function Reading({
       <small className={confirmed ? "" : "game-uncertain"}>
         {evidence?.confirmed_timestamp == null
           ? "Sin confirmar"
-          : `${confirmed ? "Confirmado" : "Último valor · sin confirmar ahora"} · ${evidence.confirmed_timestamp.toFixed(1)} s`}
+          : `${evidence.source === "manual" ? "Corrección manual" : confirmed ? "Confirmado" : "Último valor · sin confirmar ahora"} · ${evidence.confirmed_timestamp.toFixed(1)} s`}
       </small>
     </span>
   );

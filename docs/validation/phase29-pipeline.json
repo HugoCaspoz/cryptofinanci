@@ -1,0 +1,338 @@
+{
+  "mode": "real_clock_pipeline",
+  "requested_seconds": 60,
+  "samples": [
+    {
+      "elapsed_real_seconds": 10.01,
+      "python_current_bytes": 569879,
+      "python_peak_bytes": 1272279,
+      "health": {
+        "process_rss_bytes": 80564224,
+        "source_seconds": 9.600065642998743,
+        "retained": {
+          "event_log": 0,
+          "event_keys": 0,
+          "state_changes": 0,
+          "recent_hands": 0,
+          "decision_keys": 0,
+          "decision_actions": 0,
+          "opponent_profiles": 0,
+          "pending_showdowns": 0,
+          "pending_decisions": 0,
+          "pending_images": 0
+        },
+        "limits": {
+          "event_log": 40,
+          "event_keys": 40,
+          "state_changes": 40,
+          "recent_hands": 20,
+          "decision_keys": 512,
+          "decision_actions": 512,
+          "opponent_profiles": 128,
+          "pending_showdowns": 20,
+          "pending_decisions": 1,
+          "pending_images": 3
+        },
+        "important_frames_saved": 0,
+        "archive_error": null
+      },
+      "buffer": {
+        "seconds": 30,
+        "max_frames": 450,
+        "max_bytes": 67108864,
+        "frames": 100,
+        "bytes": 430688,
+        "evicted_frames": 0,
+        "encoding_failures": 0,
+        "oldest_timestamp": 0.005332584998541279,
+        "latest_timestamp": 10.004154139000093
+      },
+      "processed_frames": 20
+    },
+    {
+      "elapsed_real_seconds": 20.03,
+      "python_current_bytes": 1056877,
+      "python_peak_bytes": 1771369,
+      "health": {
+        "process_rss_bytes": 81072128,
+        "source_seconds": 19.60051086099884,
+        "retained": {
+          "event_log": 0,
+          "event_keys": 0,
+          "state_changes": 0,
+          "recent_hands": 0,
+          "decision_keys": 0,
+          "decision_actions": 0,
+          "opponent_profiles": 0,
+          "pending_showdowns": 0,
+          "pending_decisions": 0,
+          "pending_images": 0
+        },
+        "limits": {
+          "event_log": 40,
+          "event_keys": 40,
+          "state_changes": 40,
+          "recent_hands": 20,
+          "decision_keys": 512,
+          "decision_actions": 512,
+          "opponent_profiles": 128,
+          "pending_showdowns": 20,
+          "pending_decisions": 1,
+          "pending_images": 3
+        },
+        "important_frames_saved": 0,
+        "archive_error": null
+      },
+      "buffer": {
+        "seconds": 30,
+        "max_frames": 450,
+        "max_bytes": 67108864,
+        "frames": 199,
+        "bytes": 857013,
+        "evicted_frames": 0,
+        "encoding_failures": 0,
+        "oldest_timestamp": 0.005332584998541279,
+        "latest_timestamp": 20.005149783999514
+      },
+      "processed_frames": 40
+    },
+    {
+      "elapsed_real_seconds": 30.05,
+      "python_current_bytes": 1520895,
+      "python_peak_bytes": 2240139,
+      "health": {
+        "process_rss_bytes": 81600512,
+        "source_seconds": 29.596414446999916,
+        "retained": {
+          "event_log": 0,
+          "event_keys": 0,
+          "state_changes": 0,
+          "recent_hands": 0,
+          "decision_keys": 0,
+          "decision_actions": 0,
+          "opponent_profiles": 0,
+          "pending_showdowns": 0,
+          "pending_decisions": 0,
+          "pending_images": 0
+        },
+        "limits": {
+          "event_log": 40,
+          "event_keys": 40,
+          "state_changes": 40,
+          "recent_hands": 20,
+          "decision_keys": 512,
+          "decision_actions": 512,
+          "opponent_profiles": 128,
+          "pending_showdowns": 20,
+          "pending_decisions": 1,
+          "pending_images": 3
+        },
+        "important_frames_saved": 0,
+        "archive_error": null
+      },
+      "buffer": {
+        "seconds": 30,
+        "max_frames": 450,
+        "max_bytes": 67108864,
+        "frames": 298,
+        "bytes": 1283396,
+        "evicted_frames": 0,
+        "encoding_failures": 0,
+        "oldest_timestamp": 0.005332584998541279,
+        "latest_timestamp": 29.99998693999987
+      },
+      "processed_frames": 75
+    },
+    {
+      "elapsed_real_seconds": 40.06,
+      "python_current_bytes": 1530264,
+      "python_peak_bytes": 2260700,
+      "health": {
+        "process_rss_bytes": 81629184,
+        "source_seconds": 39.59375910400013,
+        "retained": {
+          "event_log": 0,
+          "event_keys": 0,
+          "state_changes": 0,
+          "recent_hands": 0,
+          "decision_keys": 0,
+          "decision_actions": 0,
+          "opponent_profiles": 0,
+          "pending_showdowns": 0,
+          "pending_decisions": 0,
+          "pending_images": 0
+        },
+        "limits": {
+          "event_log": 40,
+          "event_keys": 40,
+          "state_changes": 40,
+          "recent_hands": 20,
+          "decision_keys": 512,
+          "decision_actions": 512,
+          "opponent_profiles": 128,
+          "pending_showdowns": 20,
+          "pending_decisions": 1,
+          "pending_images": 3
+        },
+        "important_frames_saved": 0,
+        "archive_error": null
+      },
+      "buffer": {
+        "seconds": 30,
+        "max_frames": 450,
+        "max_bytes": 67108864,
+        "frames": 298,
+        "bytes": 1283337,
+        "evicted_frames": 99,
+        "encoding_failures": 0,
+        "oldest_timestamp": 10.004154139000093,
+        "latest_timestamp": 39.9971037209998
+      },
+      "processed_frames": 95
+    },
+    {
+      "elapsed_real_seconds": 50.08,
+      "python_current_bytes": 1547037,
+      "python_peak_bytes": 2277534,
+      "health": {
+        "process_rss_bytes": 81657856,
+        "source_seconds": 49.78636695400019,
+        "retained": {
+          "event_log": 0,
+          "event_keys": 0,
+          "state_changes": 0,
+          "recent_hands": 0,
+          "decision_keys": 0,
+          "decision_actions": 0,
+          "opponent_profiles": 0,
+          "pending_showdowns": 0,
+          "pending_decisions": 0,
+          "pending_images": 0
+        },
+        "limits": {
+          "event_log": 40,
+          "event_keys": 40,
+          "state_changes": 40,
+          "recent_hands": 20,
+          "decision_keys": 512,
+          "decision_actions": 512,
+          "opponent_profiles": 128,
+          "pending_showdowns": 20,
+          "pending_decisions": 1,
+          "pending_images": 3
+        },
+        "important_frames_saved": 0,
+        "archive_error": null
+      },
+      "buffer": {
+        "seconds": 30,
+        "max_frames": 450,
+        "max_bytes": 67108864,
+        "frames": 298,
+        "bytes": 1283398,
+        "evicted_frames": 198,
+        "encoding_failures": 0,
+        "oldest_timestamp": 20.005149783999514,
+        "latest_timestamp": 49.98788894399877
+      },
+      "processed_frames": 131
+    },
+    {
+      "elapsed_real_seconds": 60.09,
+      "python_current_bytes": 1550136,
+      "python_peak_bytes": 2281806,
+      "health": {
+        "process_rss_bytes": 81678336,
+        "source_seconds": 59.78326337699946,
+        "retained": {
+          "event_log": 0,
+          "event_keys": 0,
+          "state_changes": 0,
+          "recent_hands": 0,
+          "decision_keys": 0,
+          "decision_actions": 0,
+          "opponent_profiles": 0,
+          "pending_showdowns": 0,
+          "pending_decisions": 0,
+          "pending_images": 0
+        },
+        "limits": {
+          "event_log": 40,
+          "event_keys": 40,
+          "state_changes": 40,
+          "recent_hands": 20,
+          "decision_keys": 512,
+          "decision_actions": 512,
+          "opponent_profiles": 128,
+          "pending_showdowns": 20,
+          "pending_decisions": 1,
+          "pending_images": 3
+        },
+        "important_frames_saved": 0,
+        "archive_error": null
+      },
+      "buffer": {
+        "seconds": 30,
+        "max_frames": 450,
+        "max_bytes": 67108864,
+        "frames": 298,
+        "bytes": 1283335,
+        "evicted_frames": 297,
+        "encoding_failures": 0,
+        "oldest_timestamp": 29.99998693999987,
+        "latest_timestamp": 59.984530599998834
+      },
+      "processed_frames": 151
+    },
+    {
+      "elapsed_real_seconds": 70.11,
+      "python_current_bytes": 1527156,
+      "python_peak_bytes": 2281806,
+      "health": {
+        "process_rss_bytes": 81817600,
+        "source_seconds": 59.78326337699946,
+        "retained": {
+          "event_log": 0,
+          "event_keys": 0,
+          "state_changes": 0,
+          "recent_hands": 0,
+          "decision_keys": 0,
+          "decision_actions": 0,
+          "opponent_profiles": 0,
+          "pending_showdowns": 0,
+          "pending_decisions": 0,
+          "pending_images": 0
+        },
+        "limits": {
+          "event_log": 40,
+          "event_keys": 40,
+          "state_changes": 40,
+          "recent_hands": 20,
+          "decision_keys": 512,
+          "decision_actions": 512,
+          "opponent_profiles": 128,
+          "pending_showdowns": 20,
+          "pending_decisions": 1,
+          "pending_images": 3
+        },
+        "important_frames_saved": 0,
+        "archive_error": null
+      },
+      "buffer": {
+        "seconds": 30,
+        "max_frames": 450,
+        "max_bytes": 67108864,
+        "frames": 298,
+        "bytes": 1283335,
+        "evicted_frames": 297,
+        "encoding_failures": 0,
+        "oldest_timestamp": 29.99998693999987,
+        "latest_timestamp": 59.984530599998834
+      },
+      "processed_frames": 151
+    }
+  ],
+  "workers_released": true,
+  "limits_passed": true,
+  "limitations": "Synthetic 640x360 source, real capture workers and JPEG encoding, no OCR or EV calculations."
+}

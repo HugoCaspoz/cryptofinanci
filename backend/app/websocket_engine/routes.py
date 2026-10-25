@@ -1,3 +1,4 @@
+from app.version import PHASE
 import asyncio
 import anyio
 import json
@@ -6,6 +7,7 @@ from uuid import uuid4
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from app.config import Mode
+from app.web_security import trusted_origin
 
 router = APIRouter()
 SEND_TIMEOUT = 5
@@ -13,6 +15,9 @@ SEND_TIMEOUT = 5
 
 @router.websocket("/ws/live")
 async def live(websocket: WebSocket) -> None:
+    if not trusted_origin(websocket.headers) or not websocket.app.state.sessions.valid(websocket.cookies.get("zeros_session")):
+        await websocket.close(code=1008)
+        return
     await websocket.accept()
     connection_id, sequence = str(uuid4()), 0
     hub = websocket.app.state.capture_hub
@@ -69,7 +74,7 @@ async def live(websocket: WebSocket) -> None:
 
     try:
         await emit("system.ready", {
-            "mode": websocket.app.state.settings.mode, "phase": 22,
+            "mode": websocket.app.state.settings.mode, "phase": PHASE,
             "capture_available": True, "strategy_available": websocket.app.state.settings.mode == Mode.TRAINING,
         })
         async with anyio.create_task_group() as tasks:

@@ -1,4 +1,7 @@
-from fastapi import APIRouter, HTTPException, Request
+import asyncio
+from app.session_dashboard import list_sessions, session_detail, session_opponents
+from app.version import PHASE
+from fastapi import APIRouter, HTTPException, Request, Query
 
 router = APIRouter()
 
@@ -8,18 +11,16 @@ async def health(request: Request) -> dict:
     return {
         "status": "ok",
         "service": "zeros-api",
-        "phase": 22,
+        "phase": PHASE,
         "mode": request.app.state.settings.mode,
         "persistence": request.app.state.hand_store.kind,
     }
 
 
 @router.get("/api/sessions")
-async def sessions() -> dict:
-    # An explicit empty collection until session persistence is implemented.
-    return {"items": [], "total": 0, "persistence": "not_implemented"}
+async def sessions(request: Request, offset: int = Query(0, ge=0)) -> dict:
+    return await asyncio.to_thread(list_sessions, request.app.state.hand_store, request.app.state.settings.mode, offset)
 
 
-@router.get("/api/sessions/{session_id}")
-async def session(session_id: str) -> dict:
-    raise HTTPException(status_code=404, detail="Sesión no encontrada")
+router.add_api_route("/api/sessions/{session_id}", session_detail, methods=["GET"])
+router.add_api_route("/api/sessions/{session_id}/opponents", session_opponents, methods=["GET"])

@@ -1,3 +1,4 @@
+import { ExplanationPanel } from "../explanations/ExplanationPanel";
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useCapture } from "../capture/CaptureProvider";
@@ -305,6 +306,12 @@ export function StrategyPanel() {
                     </li>
                   ))}
                 </ul>
+                {result.decision_snapshot_id && (
+                  <ExplanationPanel
+                    key={result.decision_snapshot_id}
+                    identity={result.decision_snapshot_id}
+                  />
+                )}
                 <small className="strategy-footnote">
                   {result.reason} Datos de {result.timestamp?.toFixed(1) ?? "—"}{" "}
                   s; sin acciones futuras. Frecuencias redondeadas; no son una

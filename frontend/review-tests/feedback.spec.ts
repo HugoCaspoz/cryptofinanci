@@ -1,3 +1,4 @@
+import { openLiveTools } from "../tests/openLiveTools";
 import { expect, test } from "@playwright/test";
 import { resolve } from "node:path";
 
@@ -11,6 +12,7 @@ for (const policy of ["SESSION_FINISHED", "HAND_FINISHED"]) {
     page.on("pageerror", (e) => errors.push(e.message));
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.goto("/live");
+    await openLiveTools(page);
     await page.getByLabel("Momento de revisión").selectOption(policy);
     await page
       .getByRole("button", { name: "Guardar política de revisión" })
@@ -120,6 +122,29 @@ for (const policy of ["SESSION_FINISHED", "HAND_FINISHED"]) {
         .click();
       await expect(review.getByTestId("review-baseline")).toContainText("Call");
       await expect(review.getByTestId("bluff-analysis")).toBeVisible();
+      const explanation = review.getByRole("region", {
+        name: "Explicación de la decisión",
+      });
+      await explanation
+        .getByRole("button", { name: "Generar explicación", exact: true })
+        .click();
+      await expect(
+        explanation.getByTestId("decision-explanation"),
+      ).toContainText("no es dinero perdido");
+      await explanation
+        .getByLabel("Detalle de la explicación")
+        .selectOption("advanced");
+      await explanation
+        .getByRole("button", { name: "Generar explicación", exact: true })
+        .click();
+      await expect(
+        explanation.getByTestId("decision-explanation"),
+      ).toContainText("Rangos adaptativos congelados");
+      await expect(
+        review.getByRole("img", {
+          name: "Fotograma del turno confirmado de Hero",
+        }),
+      ).toBeVisible();
       await review.screenshot({ path: info.outputPath("review-desktop.png") });
       await page.setViewportSize({ width: 390, height: 844 });
       expect(
@@ -148,6 +173,14 @@ for (const policy of ["SESSION_FINISHED", "HAND_FINISHED"]) {
       expect(
         (await request.get(`/api/strategy/archive?hand_id=${handId}`)).status(),
       ).toBe(403);
+      expect(
+        (
+          await request.post(`/api/decisions/${identity}/explanation`, {
+            data: { style: "simple" },
+          })
+        ).status(),
+      ).toBe(403);
+      await expect(review.getByTestId("decision-explanation")).toHaveCount(0);
       expect(errors).toEqual([]);
     } finally {
       const capture = await (await request.get("/api/capture")).json();

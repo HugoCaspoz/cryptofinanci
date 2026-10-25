@@ -6,10 +6,21 @@ export function sendScreen(
   fps: number,
   onEnded: () => void,
   onError: (error: Error) => void,
+  kind: "screen" | "camera" = "screen",
 ) {
   const video = document.createElement("video");
   video.muted = true;
   video.playsInline = true;
+  video.autoplay = true;
+  video.setAttribute("aria-hidden", "true");
+  Object.assign(video.style, {
+    position: "fixed",
+    width: "1px",
+    height: "1px",
+    opacity: "0",
+    pointerEvents: "none",
+  });
+  document.body.appendChild(video);
   video.srcObject = stream;
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
@@ -18,6 +29,16 @@ export function sendScreen(
   const controller = new AbortController();
   const track = stream.getVideoTracks()[0];
   track.addEventListener("ended", onEnded);
+  let wakeLock: WakeLockSentinel | null = null;
+  if (kind === "camera" && navigator.wakeLock) {
+    void navigator.wakeLock
+      .request("screen")
+      .then((lock) => {
+        if (closed) void lock.release();
+        else wakeLock = lock;
+      })
+      .catch(() => {});
+  }
 
   async function tick() {
     const start = performance.now();
@@ -36,19 +57,22 @@ export function sendScreen(
           canvas.toBlob(resolve, "image/jpeg", 0.85),
         );
         if (closed) return;
-        if (!blob) throw new Error("No se pudo leer la pantalla compartida.");
-        const response = await fetch(`/api/capture/${captureId}/screen-frame`, {
-          method: "POST",
-          body: blob,
-          signal: AbortSignal.any([
-            controller.signal,
-            AbortSignal.timeout(8000),
-          ]),
-          headers: { "Content-Type": "image/jpeg" },
-        });
+        if (!blob) throw new Error("No se pudo leer la imagen de la fuente.");
+        const response = await fetch(
+          `/api/capture/${captureId}/${kind}-frame`,
+          {
+            method: "POST",
+            body: blob,
+            signal: AbortSignal.any([
+              controller.signal,
+              AbortSignal.timeout(8000),
+            ]),
+            headers: { "Content-Type": "image/jpeg" },
+          },
+        );
         if (!response.ok)
           throw new Error(
-            "Se interrumpió el envío de pantalla. Vuelve a compartirla.",
+            "Se interrumpió el envío de imágenes. Vuelve a conectar la fuente.",
           );
       }
       if (!closed)
@@ -61,7 +85,7 @@ export function sendScreen(
         onError(
           error instanceof Error
             ? error
-            : new Error("No se pudo enviar la pantalla."),
+            : new Error("No se pudo enviar la imagen."),
         );
     }
   }
@@ -71,7 +95,7 @@ export function sendScreen(
     .then(tick)
     .catch(() => {
       if (!closed)
-        onError(new Error("No se pudo iniciar la pantalla compartida."));
+        onError(new Error("No se pudo iniciar el vídeo de la fuente."));
     });
 
   return () => {
@@ -82,5 +106,7 @@ export function sendScreen(
     stream.getTracks().forEach((item) => item.stop());
     video.pause();
     video.srcObject = null;
+    video.remove();
+    if (wakeLock) void wakeLock.release().catch(() => {});
   };
 }

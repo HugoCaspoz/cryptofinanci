@@ -1,0 +1,70 @@
+user www-data;
+worker_processes auto;
+pid /tmp/zeros-nginx/nginx.pid;
+error_log /dev/stderr warn;
+events { worker_connections 512; }
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+    access_log /dev/stdout;
+    sendfile on;
+    map $http_upgrade $connection_upgrade { default upgrade; '' close; }
+    server {
+        listen ${PORT};
+        server_name _;
+        absolute_redirect off;
+        root /srv/frontend;
+        index index.html;
+        client_max_body_size 260m;
+        auth_request /_session_check;
+        error_page 401 = @signin;
+        add_header Permissions-Policy 'camera=(self), microphone=(), display-capture=(self)' always;
+        add_header Referrer-Policy same-origin always;
+        location @signin { return 302 /login; }
+        location = /_session_check {
+            internal;
+            auth_request off;
+            proxy_pass http://127.0.0.1:8000/api/auth/check;
+            proxy_pass_request_body off;
+            proxy_set_header Content-Length "";
+            proxy_set_header Cookie $http_cookie;
+        }
+        location = /login {
+            auth_request off;
+            proxy_pass http://127.0.0.1:8000/api/auth/page;
+            proxy_set_header Host $http_host;
+        }
+        location ^~ /api/auth/ {
+            auth_request off;
+            proxy_pass http://127.0.0.1:8000;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+            client_max_body_size 2k;
+        }
+        location @unauthorized {
+            default_type application/json;
+            return 401 '{"detail":"Inicia sesión para continuar."}';
+        }
+        location = /health {
+            auth_request off;
+            proxy_pass http://127.0.0.1:8000/health;
+        }
+        location /api/ {
+            error_page 401 = @unauthorized;
+            proxy_pass http://127.0.0.1:8000;
+            proxy_set_header Host $http_host;
+            proxy_read_timeout 180s;
+            proxy_request_buffering off;
+        }
+        location /ws/ {
+            error_page 401 = @unauthorized;
+            proxy_pass http://127.0.0.1:8000;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $connection_upgrade;
+            proxy_set_header Host $http_host;
+            proxy_read_timeout 60s;
+        }
+        location / { try_files $uri $uri/ /index.html; }
+    }
+}

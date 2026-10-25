@@ -15,7 +15,8 @@ export function TableOverlay({
   if (width !== layout.width || height !== layout.height)
     return (
       <span className="layout-mismatch">
-        Overlay oculto: captura {width} × {height}. Se requieren 1920 × 1080.
+        Overlay oculto: captura {width} × {height}. Adapta el layout a esta
+        imagen.
       </span>
     );
   if (!validLayout(layout))

@@ -1,3 +1,4 @@
+import { openLiveTools } from "../tests/openLiveTools";
 import { expect, test } from "@playwright/test";
 import { resolve } from "node:path";
 
@@ -10,6 +11,7 @@ test("opponent opportunities update after real OCR actions and survive a finishe
   page.on("pageerror", (e) => errors.push(e.message));
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/live");
+  await openLiveTools(page);
   const panel = page.getByRole("region", { name: "Modelo de rivales" });
   await panel.getByLabel("Añadir contexto de torneo a esta mano").check();
   await panel.getByLabel("Buy-in", { exact: true }).fill("5");

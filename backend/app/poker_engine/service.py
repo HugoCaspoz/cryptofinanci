@@ -29,9 +29,10 @@ def confirmed_state(state, evidence, timestamp=None):
 
 
 class PokerService:
-    def __init__(self, mode, on_update, engine=None):
+    def __init__(self, mode, on_update, engine=None, on_timing=None):
         self.mode, self.on_update = mode, on_update
         self.engine = engine or PokerEngine()
+        self.on_timing = on_timing
         self.task = None
         self.generation = 0
         self.reset()
@@ -84,6 +85,8 @@ class PokerService:
                 result, status = None, "error"
             if generation == self.generation:
                 self.result, self.status = result, status
+                if self.on_timing and result is not None:
+                    self.on_timing(state.scope_id, frame_id, "equity", result["analysis_latency_ms"])
                 self.on_update()
 
     def snapshot(self):

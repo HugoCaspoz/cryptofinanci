@@ -30,6 +30,7 @@ export type Strategy = {
 };
 
 export type StrategyResult = {
+  decision_snapshot_id?: string | null;
   version: string;
   status: "ready" | "waiting" | "unavailable";
   reason: string;

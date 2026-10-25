@@ -24,10 +24,14 @@ class DecisionService:
         self.storage_error = None
         self.count = 0
 
-    def enqueue(self, snapshot, event):
+    def enqueue(self, snapshot, event, jpeg=None):
+        if self.pending:
+            if self.pending[0][0].id == snapshot.id:
+                return
+            raise ValueError("Guarda la decisión pendiente antes de encolar otra.")
         self.current = snapshot
         self.current_key = snapshot.payload()["decision_key"]
-        self.pending.append((snapshot, event))
+        self.pending.append((snapshot, event, jpeg))
         if self.task is None or self.task.done():
             self.task = asyncio.create_task(self._work())
 
@@ -41,10 +45,11 @@ class DecisionService:
     async def flush(self):
         async with self.lock:
             while self.pending:
-                snapshot, event = self.pending[0]
+                snapshot, event, jpeg = self.pending[0]
                 try:
                     if self.store:
-                        await asyncio.to_thread(self.store.save_decision, snapshot.record(), event)
+                        args = (snapshot.record(), event) if jpeg is None else (snapshot.record(), event, jpeg)
+                        await asyncio.to_thread(self.store.save_decision, *args)
                 except Exception:
                     self.storage_error = "No se pudo guardar la decisión; se conserva para reintentar."
                     raise

@@ -1,3 +1,4 @@
+import { openLiveTools } from "./openLiveTools";
 import { expect, test } from "@playwright/test";
 
 test("layout loading failure can be retried without breaking capture controls", async ({
@@ -11,6 +12,7 @@ test("layout loading failure can be retried without breaking capture controls", 
     }),
   );
   await page.goto("/live");
+  await openLiveTools(page);
   const layoutPanel = page.getByRole("region", {
     name: "Configuración de la mesa",
   });
@@ -49,6 +51,7 @@ test("real backend handshake, ping and navigation", async ({ page }) => {
   });
   await page.getByRole("link", { name: "Abrir panel en directo" }).click();
   await expect(page).toHaveURL(/\/live$/);
+  await openLiveTools(page);
   const repliesBefore = await page
     .getByText("Respuesta de conexión recibida")
     .count();
@@ -62,10 +65,9 @@ test("real backend handshake, ping and navigation", async ({ page }) => {
   });
   await page.getByRole("link", { name: "Sesiones", exact: true }).click();
   await expect(
-    page.getByRole("heading", {
-      name: "Tu historia todavía está por escribir.",
-    }),
+    page.getByRole("heading", { name: "Tus sesiones", exact: true }),
   ).toBeVisible();
+  await expect(page.getByText("Consultando sesiones")).toHaveCount(0);
   expect(errors).toEqual([]);
 });
 
@@ -89,14 +91,17 @@ test("session deep link and unknown route survive refresh", async ({
 test("sessions distinguish server failure from empty data and can retry", async ({
   page,
 }) => {
-  await page.route("**/api/sessions", (route) =>
+  await page.route("**/api/sessions*", (route) =>
     route.fulfill({ status: 503, body: "{}" }),
   );
   await page.goto("/sessions");
   await expect(page.getByRole("alert")).toContainText(
     "No se pudieron cargar las sesiones.",
   );
-  await page.unroute("**/api/sessions");
+  await page.unroute("**/api/sessions*");
+  await page.route("**/api/sessions*", (route) =>
+    route.fulfill({ json: { items: [], total: 0 } }),
+  );
   await page.getByRole("button", { name: "Reintentar" }).click();
   await expect(
     page.getByRole("heading", {
@@ -134,17 +139,20 @@ test("websocket reconnects after a transport interruption", async ({
   page,
 }) => {
   let connections = 0;
+  let disconnect: (() => void) | undefined;
   await page.routeWebSocket("**/ws/live", (ws) => {
     connections += 1;
     const server = ws.connectToServer();
-    if (connections === 1)
-      server.onMessage((message) => {
-        ws.send(message);
-        if (String(message).includes("system.ready"))
-          setTimeout(() => ws.close(), 300);
-      });
+    server.onMessage((message) => {
+      ws.send(message);
+      if (String(message).includes("system.ready"))
+        disconnect = () => ws.close();
+    });
   });
   await page.goto("/");
+  await expect(page.getByRole("status")).toHaveText("Backend conectado");
+  await expect.poll(() => Boolean(disconnect)).toBe(true);
+  disconnect!();
   await expect(page.getByRole("status")).toHaveText("Reconectando…");
   await expect(page.getByRole("status")).toHaveText("Backend conectado");
   expect(connections).toBeGreaterThanOrEqual(2);

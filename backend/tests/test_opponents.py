@@ -224,7 +224,7 @@ def test_incomplete_history_never_fills_missing_opportunities(bad):
     elif bad == "wrong_turn":
         s.action(2, "RAISED", 300)
     else:
-        s.state = replace(s.state, players=tuple(replace(p, current_bet=None) if p.seat == 3 else p for p in s.state.players))
+        s.state = replace(s.state, players=tuple(replace(p, current_bet=None) if p.seat == 2 else p for p in s.state.players))
         s.action(1, "RAISED", 300)
     assert not s.model.snapshot()["context_valid"]
     assert s.stat(1, "vpip")["opportunities"] == 0

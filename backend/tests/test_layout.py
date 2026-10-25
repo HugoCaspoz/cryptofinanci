@@ -10,6 +10,15 @@ from app.table_detector.layout import TableLayout
 from app.table_detector.store import DEFAULT_LAYOUT_PATH, LayoutConflict, LayoutStore
 
 
+def test_persistent_layout_path_from_environment(layout_path, monkeypatch, tmp_path):
+    monkeypatch.setenv("TABLE_LAYOUT_PATH", str(layout_path))
+    store = LayoutStore()
+    assert store.path == layout_path
+    assert store.read() == LayoutStore(layout_path).read()
+    explicit = tmp_path / "explicit.json"
+    assert LayoutStore(explicit).path == explicit
+
+
 @pytest.fixture
 def layout_path(tmp_path):
     path = tmp_path / "layout.json"

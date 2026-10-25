@@ -8,6 +8,7 @@ class PlayerState:
     seat: int
     nickname: str | None = None
     position: str | None = None
+    observed_action: str | None = None
     stack: str | None = None
     stack_unit: str | None = None
     current_bet: str | None = None
@@ -42,3 +43,4 @@ class FieldEvidence:
     confirmed_frame_id: int | None
     confirmed_timestamp: float | None
     layout_revision: str | None
+    source: str = "vision"

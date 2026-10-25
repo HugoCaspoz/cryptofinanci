@@ -69,7 +69,9 @@ export function useTableLayout() {
       setLayout(data);
       setSaved(JSON.stringify(data));
       setRevision(response.headers.get("ETag") || "");
-      setMessage("Layout guardado.");
+      setMessage(
+        "Layout guardado. Se aplicará al iniciar la siguiente captura.",
+      );
     } catch (e) {
       setError(
         e instanceof Error ? e.message : "No se pudo guardar el layout.",
@@ -92,11 +94,50 @@ export function useTableLayout() {
   }
 
   function updateDetails(
-    update: Partial<Pick<TableLayout, "platform" | "calibrated">>,
+    update: Partial<
+      Pick<TableLayout, "platform" | "calibrated" | "card_profile">
+    >,
   ) {
     setMessage("");
     setLayout((previous) =>
       previous ? { ...previous, calibrated: false, ...update } : null,
+    );
+  }
+
+  function fitFrame(width: number, height: number) {
+    if (!layout || width < 320 || height < 240 || width > 3840 || height > 2160)
+      return;
+    const next = structuredClone(layout);
+    for (const { region } of regionEntries(next)) {
+      region.x = Math.min(
+        width - 1,
+        Math.round((region.x * width) / layout.width),
+      );
+      region.y = Math.min(
+        height - 1,
+        Math.round((region.y * height) / layout.height),
+      );
+      region.width = Math.max(
+        1,
+        Math.min(
+          width - region.x,
+          Math.round((region.width * width) / layout.width),
+        ),
+      );
+      region.height = Math.max(
+        1,
+        Math.min(
+          height - region.y,
+          Math.round((region.height * height) / layout.height),
+        ),
+      );
+    }
+    next.width = width;
+    next.height = height;
+    next.calibrated = false;
+    setLayout(next);
+    setMessage(
+      "Regiones adaptadas. Revisa su posición y guarda antes de reiniciar la captura.",
     );
   }
 
@@ -115,6 +156,8 @@ export function useTableLayout() {
     save,
     updateRegion,
     updateDetails,
+    fitFrame,
+    revision,
     dirty: layout !== null && JSON.stringify(layout) !== saved,
   };
 }

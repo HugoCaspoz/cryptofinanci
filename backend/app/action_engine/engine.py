@@ -39,7 +39,7 @@ class ActionEngine:
 
     def decorate(self, state, active=None):
         return replace(state, current_player=state.players[active].player_id if active is not None else None,
-                       players=tuple(replace(p, folded=True if i in self.folded else None,
+                       players=tuple(replace(p, observed_action=self.last_labels[i], folded=True if i in self.folded else None,
                                              all_in=True if i in self.all_in else None)
                                      for i, p in enumerate(state.players)))
 

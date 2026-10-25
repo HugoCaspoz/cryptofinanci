@@ -12,6 +12,7 @@ type LiveState = {
   ping: () => void;
   captureSnapshot: CaptureStatus | null;
   captureReady: boolean;
+  captureReceivedAt: number | null;
 };
 
 const LiveContext = createContext<LiveState | null>(null);
@@ -22,9 +23,12 @@ export function LiveProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<LiveEvent[]>([]);
   const [latency, setLatency] = useState<number | null>(null);
   const sendPing = useRef<() => void>(() => {});
-  const [captureSnapshot, setCaptureSnapshot] = useState<CaptureStatus | null>(
-    null,
-  );
+  const [delivery, setDelivery] = useState<{
+    capture: CaptureStatus;
+    receivedAt: number;
+  } | null>(null);
+  const captureSnapshot = delivery?.capture ?? null;
+  const captureReceivedAt = delivery?.receivedAt ?? null;
   const [captureReady, setCaptureReady] = useState(false);
 
   useEffect(() => {
@@ -61,6 +65,7 @@ export function LiveProvider({ children }: { children: ReactNode }) {
         else ping();
       }, 5_000);
       socket.onmessage = ({ data }) => {
+        const receivedAt = performance.now();
         if (disposed || currentSocket !== socket || typeof data !== "string")
           return;
         const event = parseEvent(data);
@@ -74,7 +79,7 @@ export function LiveProvider({ children }: { children: ReactNode }) {
         sequence = event.sequence;
         lastMessage = Date.now();
         if (event.type === "capture.snapshot") {
-          setCaptureSnapshot(event.payload.capture);
+          setDelivery({ capture: event.payload.capture, receivedAt });
           setCaptureReady(true);
           return;
         }
@@ -93,6 +98,14 @@ export function LiveProvider({ children }: { children: ReactNode }) {
       };
       socket.onerror = () => currentSocket.close();
       socket.onclose = () => {
+        if (!disposed)
+          void fetch("/api/auth/status")
+            .then((r) => r.json())
+            .then((auth) => {
+              if (!disposed && auth.enabled && !auth.authenticated)
+                window.location.assign("/login");
+            })
+            .catch(() => {});
         if (currentSocket !== socket) return;
         clearInterval(heartbeat);
         sentAt = null;
@@ -128,6 +141,7 @@ export function LiveProvider({ children }: { children: ReactNode }) {
         ping: () => sendPing.current(),
         captureSnapshot,
         captureReady,
+        captureReceivedAt,
       }}
     >
       {children}

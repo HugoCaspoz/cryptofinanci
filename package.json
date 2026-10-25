@@ -1,0 +1,8 @@
+{
+  "name": "zeros-poker-infrastructure",
+  "private": true,
+  "scripts": { "deploy": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Deploy-Railway.ps1" },
+  "devDependencies": {
+    "railway": "^3.16.0"
+  }
+}

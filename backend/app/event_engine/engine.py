@@ -17,7 +17,8 @@ class EventEngine:
         event = PokerEvent(sequence=self.replay.sequence + 1, scope_id=state.scope_id,
                            hand_id=state.hand_id, type=event_type, state_after=state,
                            frame_id=frame_id, timestamp=timestamp, **details)
-        key = (event.type, event.player_id)
+        key = (event.type, event.player_id, event.correction_id,
+               event.action_evidence if event.type == "ANALYSIS_RESUMED" else ())
         if frame_id == self.replay.frame_id and key in self._frame_keys:
             old = self._frame_keys[key]
             if event.model_copy(update={"sequence": old.sequence}) == old:
@@ -29,6 +30,8 @@ class EventEngine:
         self._frame_keys[key] = event
         if len(self.events) == self.CAPACITY:
             removed = self.events.popleft()
+            # Same-frame manual edits also expire from the deduplication map.
+            self._frame_keys = {k: v for k, v in self._frame_keys.items() if v is not removed}
             self.checkpoint = Checkpoint(sequence=removed.sequence, frame_id=removed.frame_id,
                                          timestamp=removed.timestamp, state=removed.state_after)
         self.events.append(event)

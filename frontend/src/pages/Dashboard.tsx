@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { Icon } from "../components/Icon";
 import { EventLog } from "../components/EventLog";
@@ -5,6 +6,20 @@ import { useLive } from "../live/LiveProvider";
 
 export function Dashboard() {
   const { status, latency, mode } = useLive();
+  const [total, setTotal] = useState<number | null>(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/sessions", { signal: controller.signal })
+      .then((r) => {
+        if (!r.ok) throw new Error();
+        return r.json();
+      })
+      .then((data) => {
+        if (!controller.signal.aborted) setTotal(data.total);
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, [status]);
   return (
     <>
       <div className="page-heading">
@@ -16,7 +31,7 @@ export function Dashboard() {
           </p>
         </div>
         <span className="phase-badge">
-          FASE 22 <span>/ 30</span>
+          FASE 30 <span>/ 30</span>
         </span>
       </div>
       <section className="hero-panel">
@@ -37,7 +52,7 @@ export function Dashboard() {
             Abrir panel en directo <Icon name="arrow" size={18} />
           </Link>
           <span className="hero-caption">
-            Archivo, pantalla o ventana · 5 FPS por defecto
+            Archivo, pantalla o ventana · Muestreo inteligente 2/10 FPS
           </span>
         </div>
         <div className="hero-art" aria-hidden="true">
@@ -80,8 +95,10 @@ export function Dashboard() {
             <Icon name="sessions" />
             Sesiones guardadas
           </span>
-          <strong>—</strong>
-          <small>Almacenamiento pendiente</small>
+          <strong>{total ?? "—"}</strong>
+          <small>
+            <Link to="/sessions">Abrir archivo de sesiones</Link>
+          </small>
         </article>
         <article className="metric">
           <span>
@@ -121,16 +138,16 @@ export function Dashboard() {
           </div>
         </section>
         <section className="panel next-panel">
-          <span className="step-number">23</span>
-          <span className="eyebrow">EL SIGUIENTE PASO</span>
-          <h2>Volver al momento de decidir.</h2>
+          <span className="step-number">30</span>
+          <span className="eyebrow">REVISIÓN DE SESIÓN</span>
+          <h2>Revisar la sesión completa.</h2>
           <p>
-            La próxima fase organizará las decisiones en una línea temporal,
-            vinculadas al fotograma y al estado de cada momento.
+            Consulta la cobertura, las diferencias de EV y las decisiones
+            archivadas de cada sesión.
           </p>
           <div className="next-tag">
-            <Icon name="live" size={16} /> Timeline de decisiones{" "}
-            <span>PRÓXIMAMENTE</span>
+            <Icon name="live" size={16} /> Dashboard final{" "}
+            <Link to="/sessions">Ver sesiones</Link>
           </div>
         </section>
       </div>

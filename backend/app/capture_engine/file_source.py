@@ -38,17 +38,28 @@ class FileVideoSource(VideoSource):
         self._read_index = -1
         self._frame_id = 0
         self._started = self.clock()
+        self._paused_at = None
+
+    def pause(self):
+        if self._paused_at is None:
+            self._paused_at = self.clock()
+
+    def resume(self):
+        if self._paused_at is not None:
+            self._started += self.clock() - self._paused_at
+            self._paused_at = None
 
     def get_frame(self) -> Frame | None:
         if self._capture is None:
             raise SourceError("La fuente de vídeo no está abierta.")
-        target = int((self.clock() - self._started) * self.source_fps)
+        target = int(((self._paused_at if self._paused_at is not None else self.clock()) - self._started) * self.source_fps)
         if target >= self._total:
             raise EndOfSource
         if target <= self._read_index:
             return None
         # Advance with the source clock. Skipped frames are not turned into
         # observations, and the entire video is never loaded into memory.
+        decode_started = time.monotonic()
         while self._read_index < target:
             if not self._capture.grab():
                 raise SourceError("El vídeo terminó antes de lo indicado o no se pudo decodificar.")
@@ -57,7 +68,8 @@ class FileVideoSource(VideoSource):
         if not ok or image is None:
             raise SourceError("No se pudo decodificar un frame del vídeo.")
         self._frame_id += 1
-        return Frame(self._frame_id, self._read_index / self.source_fps, image, self.capture_fps)
+        return Frame(self._frame_id, self._read_index / self.source_fps, image, self.capture_fps,
+                     capture_latency_ms=(time.monotonic() - decode_started) * 1000)
 
     def stop(self) -> None:
         if self._capture is not None:

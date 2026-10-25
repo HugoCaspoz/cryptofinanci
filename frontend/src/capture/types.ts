@@ -1,3 +1,4 @@
+import type { LatencySummary } from "../live/latency";
 import type { CardState } from "../cards/types";
 import type { OcrState } from "../ocr/types";
 import type { GameState } from "../game/types";
@@ -10,6 +11,24 @@ import type { StrategyState } from "../strategy/types";
 import type { DecisionState } from "../decisions/types";
 
 export type PipelineMetrics = {
+  buffer?: {
+    seconds: number;
+    frames: number;
+    bytes: number;
+    max_bytes: number;
+    max_frames: number;
+    oldest_timestamp: number | null;
+    latest_timestamp: number | null;
+    evicted_frames: number;
+    encoding_failures: number;
+  };
+  sampling?: {
+    mode: string;
+    target_fps: number;
+    observed_frames?: number;
+    skipped_frames?: number;
+  };
+  latencies?: Record<string, LatencySummary>;
   active: boolean;
   window_seconds: number;
   capture_fps: number;
@@ -30,11 +49,24 @@ export type PipelineMetrics = {
 };
 
 export type CaptureStatus = {
+  session_health?: {
+    process_rss_bytes: number | null;
+    source_seconds: number;
+    retained: Record<string, number>;
+    limits: Record<string, number>;
+    archive_error?: string | null;
+    important_frames_saved: number;
+  };
+  analysis_control?: {
+    paused: boolean;
+    revision: number;
+    last_correction_id?: string | null;
+  };
   server_id: string;
   revision: number;
   capture_id: string | null;
   state: "idle" | "running" | "ended" | "stopped" | "error";
-  source: "file" | "screen" | null;
+  source: "file" | "screen" | "camera" | null;
   name: string | null;
   capture_fps: number;
   duration: number | null;

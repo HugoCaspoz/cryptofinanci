@@ -1,0 +1,42 @@
+{
+  "phase": 30,
+  "version": "0.30.0",
+  "date": "2026-10-23",
+  "backend": {
+    "passed": 654,
+    "failed": 0,
+    "new_session_tests": 23,
+    "seconds": 111.54,
+    "postgres_database": "zeros_phase30_checks",
+    "sqlite": true
+  },
+  "browser": {
+    "engine": "Edge via Playwright chromium channel msedge",
+    "regression_and_sessions_passed": 14,
+    "training_strategy_passed": 1,
+    "viewports": [
+      1440,
+      390
+    ],
+    "includes": [
+      "session ranking to frozen decision/frame/local explanation",
+      "WebSocket review revocation",
+      "empty/error/retry/session pagination navigation",
+      "capture/history/correction/sampling/latency regressions"
+    ]
+  },
+  "checks": {
+    "frontend_build": "passed",
+    "prettier": "passed",
+    "git_diff_check": "passed",
+    "compose_health": "3 healthy",
+    "main_mode": "LIVE_REAL_MONEY",
+    "main_capture": "idle"
+  },
+  "limits": [
+    "Synthetic fixtures; no real poker platform accuracy validation",
+    "No paid OpenAI call in this phase",
+    "No eight-hour real-time OCR/browser test",
+    "Missing statistics remain unknown and EV is archived model regret, not monetary loss"
+  ]
+}

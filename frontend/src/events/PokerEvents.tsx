@@ -2,6 +2,8 @@ import { useCapture } from "../capture/CaptureProvider";
 import { useState } from "react";
 
 export const eventLabels: Record<string, string> = {
+  MANUAL_CORRECTION: "Corrección manual guardada",
+  ANALYSIS_RESUMED: "Análisis reanudado",
   GAME_STATE_UPDATED: "Estado actualizado",
   HOLE_CARDS_DETECTED: "Cartas de Hero confirmadas",
   HERO_CARDS_CLEARED: "Cartas de Hero retiradas",

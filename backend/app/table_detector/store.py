@@ -15,8 +15,8 @@ class LayoutConflict(Exception):
 
 
 class LayoutStore:
-    def __init__(self, path: Path = DEFAULT_LAYOUT_PATH):
-        self.path = path
+    def __init__(self, path: Path | None = None):
+        self.path = Path(path) if path is not None else Path(os.getenv("TABLE_LAYOUT_PATH", str(DEFAULT_LAYOUT_PATH)))
         self._lock = RLock()
 
     def read(self) -> tuple[TableLayout, str]:

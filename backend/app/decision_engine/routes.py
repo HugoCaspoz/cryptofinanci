@@ -1,6 +1,6 @@
 import asyncio
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, HTTPException, Query, Request, Response
 
 from app.config import Mode
 from app.feedback.policy import require_access
@@ -34,3 +34,13 @@ async def evaluation(identity: str, request: Request):
     result = await asyncio.to_thread(request.app.state.hand_store.get_evaluation, identity)
     await require_access(request, record["hand_id"], record["mode"], record["scope_id"])
     return result
+
+
+@router.get("/{identity}/frame")
+async def frame(identity: str, request: Request):
+    record = await detail(identity, request)
+    jpeg = await asyncio.to_thread(request.app.state.hand_store.get_decision_frame, identity)
+    await require_access(request, record["hand_id"], record["mode"], record["scope_id"])
+    if jpeg is None:
+        raise HTTPException(404, "Esta decisión no tiene un fotograma guardado.")
+    return Response(jpeg, media_type="image/jpeg")

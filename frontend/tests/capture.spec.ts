@@ -1,3 +1,4 @@
+import { openLiveTools } from "./openLiveTools";
 import { chromium, expect, test } from "@playwright/test";
 import { resolve } from "node:path";
 import { existsSync } from "node:fs";
@@ -77,6 +78,7 @@ test("file playback returns backend frames, persists through navigation and reac
   request,
 }) => {
   await page.goto("/live");
+  await openLiveTools(page);
   await page
     .getByLabel("Archivo de vídeo")
     .setInputFiles(resolve("../sample_data/capture-demo.avi"));
@@ -156,6 +158,7 @@ test("layout overlay follows the original frame and edits survive reload", async
   try {
     await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto("/live");
+    await openLiveTools(page);
     await page
       .getByLabel("Archivo de vídeo")
       .setInputFiles(resolve("../sample_data/table-layout-demo.avi"));
@@ -294,6 +297,7 @@ test("invalid video is rejected and cancelled sharing leaves no active source", 
     };
   });
   await page.goto("/live");
+  await openLiveTools(page);
   await page.getByLabel("Archivo de vídeo").setInputFiles({
     name: "broken.mp4",
     mimeType: "video/mp4",
@@ -332,6 +336,7 @@ test("native browser tab sharing reaches backend and stops cleanly", async ({
     );
     const page = await context.newPage();
     await page.goto("/live");
+    await openLiveTools(page);
     await page.getByLabel("FPS de captura").selectOption("2");
     await page
       .getByRole("button", { name: "Compartir pantalla o ventana" })

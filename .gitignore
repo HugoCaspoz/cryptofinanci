@@ -6,8 +6,11 @@ __pycache__/
 pytest-cache-files-*/
 *.pyc
 .env
+.mobile/
+.railway-local/
 !.env.example
 test-results/
+test-results-mobile/
 test-results-training/
 test-results-review/
 playwright-report/

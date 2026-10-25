@@ -6,11 +6,14 @@ from .models import DecisionSnapshot
 
 class DecisionTracker:
     """GameState-owned projection: one snapshot per turn opportunity, not per frame/config change."""
+    MAX_TURN_KEYS = 512
+
     def __init__(self):
         self.cursor = 0
         self.hand_id = None
         self.actions = []
         self.complete = False
+        self.manual_barrier = None
         self.last_action = 0
         self.seen = set()
         self.active = None
@@ -23,6 +26,7 @@ class DecisionTracker:
         if self.hand_id != state.hand_id:
             self.hand_id, self.actions, self.seen, self.complete = state.hand_id, [], set(), False
             self.last_action = 0
+            self.manual_barrier = None
         selected = [e for e in events if e.sequence > self.cursor]
         if any(e.scope_id != state.scope_id or frame is None or timestamp is None
                or e.sequence > sequence or e.frame_id > frame or e.timestamp > timestamp for e in selected):
@@ -37,6 +41,9 @@ class DecisionTracker:
                 if event.type == "HAND_STARTED" and event.hand_id == state.hand_id:
                     self.hand_id, self.actions, self.seen = event.hand_id, [], set()
                     self.complete, self.last_action = True, 0
+                if event.type in {"MANUAL_CORRECTION", "ANALYSIS_RESUMED"}:
+                    self.complete = False
+                    self.manual_barrier = (event.hand_id, event.state_after.street, self.last_action)
                 if event.hand_id == state.hand_id and event.type.value.startswith("PLAYER_"):
                     self.last_action = event.sequence
                     if len(self.actions) < 512:
@@ -51,14 +58,19 @@ class DecisionTracker:
         self.active = None
         if not self.observe(events, request.sequence, state, request.frame_id, request.timestamp):
             return None
+        if self.manual_barrier == (state.hand_id, state.street, self.last_action):
+            self.reason = "Turno corregido o interrumpido; espera otra acción confirmada para crear decisiones."
+            return None
         hero = next((p for p in state.players if p.seat == request.poker.hero_seat), None)
+        participants = set(request.decision.live) if request.decision else {request.poker.hero_seat, *(p.seat for p in request.poker.opponents)}
+        participants.add(request.poker.hero_seat)
         if not running or state.hand_status != "active" or hero is None or hero.folded or hero.all_in or state.current_player != hero.player_id:
             self.reason = "Esperando un turno observado de Hero."
             return None
         if (request.frame_id is None or request.timestamp is None or len(state.hero_cards) != 2
                 or state.street != {0: "preflop", 3: "flop", 4: "turn", 5: "river"}.get(len(state.board))
                 or any(v is None for v in (state.pot, state.small_blind, state.big_blind))
-                or any(p.stack is None or p.current_bet is None for p in state.players)):
+                or any(p.stack is None or p.current_bet is None for p in state.players if p.seat in participants)):
             self.reason = "Turno de Hero observado; faltan cartas o importes confirmados."
             return None
         try:
@@ -77,7 +89,7 @@ class DecisionTracker:
                     raise ValueError()
                 bets = dict(decision.bets_bb)
                 if any(Decimal(p.current_bet) / Decimal(state.big_blind) != bets[p.seat]
-                       for p in state.players if p.seat in bets):
+                       for p in state.players if p.seat in bets and p.seat in participants):
                     raise ValueError()
         except (ValueError, ArithmeticError):
             self.reason = "El turno y los datos de la decisión no son coherentes."
@@ -86,6 +98,10 @@ class DecisionTracker:
         if key in self.seen:
             self.active = key
             self.reason = "Decisión ya congelada; los cambios posteriores no la reescriben."
+            return None
+        if len(self.seen) >= self.MAX_TURN_KEYS:
+            self.complete = False
+            self.reason = "Límite de decisiones de esta mano; se conserva el historial sin crear duplicados."
             return None
         snapshot = DecisionSnapshot.create(request, mode=mode, decision_key=key, actions=self.actions,
             history_complete=self.complete, evidence=evidence, opponents=opponents, preflop_config=preflop_config)

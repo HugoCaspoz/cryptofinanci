@@ -8,6 +8,8 @@ from .state_validation import validate_state
 
 
 class EventType(StrEnum):
+    MANUAL_CORRECTION = "MANUAL_CORRECTION"
+    ANALYSIS_RESUMED = "ANALYSIS_RESUMED"
     GAME_STATE_UPDATED = "GAME_STATE_UPDATED"
     HOLE_CARDS_DETECTED = "HOLE_CARDS_DETECTED"
     HERO_CARDS_CLEARED = "HERO_CARDS_CLEARED"
@@ -47,11 +49,14 @@ class PokerEvent(BaseModel):
     amount: str | None = None
     unit: str | None = None
     action_evidence: tuple[str, ...] = ()
+    correction_id: str | None = Field(default=None, min_length=36, max_length=36)
     decision_id: str | None = Field(default=None, min_length=64, max_length=64)
     state_after: GameState
 
     @model_validator(mode="after")
     def consistent(self):
+        if (self.type == EventType.MANUAL_CORRECTION) != (self.correction_id is not None):
+            raise ValueError("Solo las correcciones manuales llevan correction_id.")
         state = self.state_after
         validate_state(state)
         if state.scope_id != self.scope_id or state.hand_id != self.hand_id:

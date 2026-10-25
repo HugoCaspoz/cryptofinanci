@@ -7,6 +7,7 @@ export default defineConfig({
   use: {
     baseURL: process.env.REVIEW_E2E_URL || "http://127.0.0.1:5173",
     trace: "retain-on-failure",
+    channel: process.env.E2E_BROWSER_CHANNEL,
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 });

@@ -1,0 +1,45 @@
+{
+  "feature": "mobile-camera",
+  "date": "2026-10-23",
+  "backend": {
+    "passed": 662,
+    "new_camera_tests": 8,
+    "seconds": 114.8,
+    "postgres": "dedicated zeros_phase30_checks",
+    "sqlite": true
+  },
+  "browser": {
+    "regression_and_camera_passed": 18,
+    "https_gateway_passed": 1,
+    "camera": "Chromium/Edge fake camera with real getUserMedia/encoding/upload",
+    "mobile_viewport_width": 390,
+    "real_phone": false
+  },
+  "https": {
+    "ca_and_ip_verified_by_node": true,
+    "unauthenticated_401": true,
+    "authenticated_200": true,
+    "authenticated_websocket": true,
+    "public_certificate_download_200": true,
+    "windows_firewall_rule_created": false,
+    "firewall_reason": "Current session is not an administrator",
+    "app_and_credentials_publicly_published": false
+  },
+  "deployment": {
+    "main_capture": "idle",
+    "main_database_modified_by_synthetic_tests": false,
+    "healthy_services": [
+      "backend",
+      "frontend",
+      "db",
+      "mobile"
+    ]
+  },
+  "limits": [
+    "Manual CA installation and trust on phone required",
+    "Phone connectivity and camera hardware not tested",
+    "Windows firewall rule may require administrator command",
+    "No automatic perspective correction",
+    "Real table camera OCR accuracy still unvalidated"
+  ]
+}

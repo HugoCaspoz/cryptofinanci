@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-25",
+  "version": "0.30.1",
+  "backend_full_passed": 679,
+  "backend_targeted_final_passed": 21,
+  "browser_regression_passed": 20,
+  "training_strategy_passed": 1,
+  "nginx_local_authentication_passed": true,
+  "railway_browser_passed": true,
+  "railway_deployment": "edd36dca-cadf-4d0a-8b5b-0efbaecbe129",
+  "production_cookie_secure": true,
+  "production_readonly_timings_ms": {
+    "health": [
+      614,
+      544,
+      563
+    ],
+    "capture": [
+      616,
+      636,
+      647
+    ]
+  },
+  "backup": {
+    "downloaded": true,
+    "pg_restore_list": true,
+    "isolated_postgres_18_restore": true,
+    "tables_restored": 16,
+    "scheduled": false,
+    "schedule_rejection": "Pro workspaces required",
+    "latest_backup": "20261025-140708",
+    "latest_sessions_restored": 3
+  },
+  "remaining": [
+    "Real platform deck references and physical phone accuracy validation",
+    "Correct GitHub repository selection to run prepared CI",
+    "Automatic backup schedule unavailable on current Railway plan",
+    "No automatic perspective correction or exact multiway/GTO/ICM solver"
+  ],
+  "authenticated_camera_ingress_browser_passed": true
+}

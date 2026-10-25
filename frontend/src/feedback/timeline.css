@@ -1,0 +1,46 @@
+.decision-timeline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 0;
+  list-style: none;
+}
+.decision-timeline .button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  white-space: normal;
+  text-align: left;
+}
+.decision-timeline [aria-pressed="true"] {
+  outline: 2px solid var(--accent, #73d5ac);
+  outline-offset: 2px;
+}
+.decision-timeline span {
+  font-size: 0.8rem;
+}
+.decision-frame {
+  display: block;
+  width: 100%;
+  max-width: 1280px;
+  height: auto;
+  margin: 16px 0;
+  border-radius: 12px;
+}
+.decision-state {
+  max-height: 360px;
+  overflow: auto;
+  max-width: 100%;
+  white-space: normal;
+}
+.decision-state table {
+  min-width: 520px;
+  width: 100%;
+}
+.decision-state th,
+.decision-state td {
+  padding: 8px;
+  text-align: left;
+  overflow-wrap: normal;
+}

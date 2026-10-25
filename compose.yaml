@@ -1,11 +1,21 @@
 name: zeros
+x-logging: &bounded-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
 services:
   backend:
+    logging: *bounded-logging
     build: ./backend
     environment:
       APP_MODE: ${APP_MODE:-LIVE_REAL_MONEY}
+      EXPLAINER_PROVIDER: ${EXPLAINER_PROVIDER:-local}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-}
       FEEDBACK_RELEASE: ${FEEDBACK_RELEASE:-SESSION_FINISHED}
       FRAME_QUEUE_SIZE: ${FRAME_QUEUE_SIZE:-2}
+      FRAME_BUFFER_SECONDS: ${FRAME_BUFFER_SECONDS:-10}
       CARD_TEMPLATE_DIR: ${CARD_TEMPLATE_DIR:-}
       OCR_DECIMAL_SEPARATOR: ${OCR_DECIMAL_SEPARATOR:-.}
       DATABASE_URL: postgresql://${POSTGRES_USER:-zeros}:${POSTGRES_PASSWORD:-zeros_local_dev}@db:5432/${POSTGRES_DB:-zeros}
@@ -24,6 +34,7 @@ services:
       retries: 5
       start_period: 10s
   frontend:
+    logging: *bounded-logging
     build: ./frontend
     ports:
       - "127.0.0.1:5173:80"
@@ -36,6 +47,7 @@ services:
       timeout: 5s
       retries: 5
   db:
+    logging: *bounded-logging
     image: postgres:17-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-zeros}

@@ -12,6 +12,10 @@ export type DecisionSummary = {
   action_count: number;
   history_complete: boolean;
   strategy_input_available: boolean;
+  frame_available?: boolean;
+  evaluation_status?: string;
+  actual_action?: { action: string } | null;
+  ev_difference_bb?: number | null;
 };
 export type DecisionState = {
   visibility: "training" | "internal_only";
@@ -32,7 +36,16 @@ export type DecisionDetail = Omit<
   request: {
     state: Pick<
       GameState,
-      "hero_cards" | "board" | "pot" | "pot_unit" | "street" | "players"
+      | "hero_cards"
+      | "board"
+      | "pot"
+      | "pot_unit"
+      | "street"
+      | "players"
+      | "small_blind"
+      | "big_blind"
+      | "blinds_unit"
+      | "current_player"
     >;
     decision: {
       exploit_pools: Pool[];

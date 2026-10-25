@@ -1,0 +1,269 @@
+{
+  "synthetic": true,
+  "realtime": false,
+  "source_hours": 8,
+  "elapsed_real_seconds": 310.88,
+  "frames_inspected": 288001,
+  "python_growth_after_one_hour_bytes": 32925,
+  "samples": [
+    {
+      "source_hours": 1.0,
+      "elapsed_real_seconds": 27.61,
+      "python_current_bytes": 790786,
+      "python_peak_bytes": 1230925,
+      "process_rss_bytes": 78540800,
+      "buffer": {
+        "seconds": 30,
+        "max_frames": 450,
+        "max_bytes": 67108864,
+        "frames": 301,
+        "bytes": 217443,
+        "evicted_frames": 35700,
+        "encoding_failures": 0,
+        "oldest_timestamp": 3570.0,
+        "latest_timestamp": 3600.0
+      },
+      "event_log": 40,
+      "event_keys": 1,
+      "profiles": 128,
+      "identities_created": 361,
+      "decision_keys": 0,
+      "recent_hands": 20,
+      "archive_rows": {
+        "observed_events": 3120,
+        "observed_hands": 180,
+        "decision_snapshots": 360,
+        "important_frames": 361,
+        "manual_corrections": 1,
+        "opponent_profiles": 360
+      }
+    },
+    {
+      "source_hours": 2.0,
+      "elapsed_real_seconds": 58.93,
+      "python_current_bytes": 801238,
+      "python_peak_bytes": 1262465,
+      "process_rss_bytes": 79855616,
+      "buffer": {
+        "seconds": 30,
+        "max_frames": 450,
+        "max_bytes": 67108864,
+        "frames": 301,
+        "bytes": 217443,
+        "evicted_frames": 71700,
+        "encoding_failures": 0,
+        "oldest_timestamp": 7170.0,
+        "latest_timestamp": 7200.0
+      },
+      "event_log": 40,
+      "event_keys": 1,
+      "profiles": 128,
+      "identities_created": 722,
+      "decision_keys": 0,
+      "recent_hands": 20,
+      "archive_rows": {
+        "observed_events": 6242,
+        "observed_hands": 360,
+        "decision_snapshots": 720,
+        "important_frames": 722,
+        "manual_corrections": 2,
+        "opponent_profiles": 721
+      }
+    },
+    {
+      "source_hours": 3.0,
+      "elapsed_real_seconds": 91.17,
+      "python_current_bytes": 805899,
+      "python_peak_bytes": 1268045,
+      "process_rss_bytes": 79949824,
+      "buffer": {
+        "seconds": 30,
+        "max_frames": 450,
+        "max_bytes": 67108864,
+        "frames": 301,
+        "bytes": 217443,
+        "evicted_frames": 107700,
+        "encoding_failures": 0,
+        "oldest_timestamp": 10770.0,
+        "latest_timestamp": 10800.0
+      },
+      "event_log": 40,
+      "event_keys": 1,
+      "profiles": 128,
+      "identities_created": 1083,
+      "decision_keys": 0,
+      "recent_hands": 20,
+      "archive_rows": {
+        "observed_events": 9364,
+        "observed_hands": 540,
+        "decision_snapshots": 1080,
+        "important_frames": 1083,
+        "manual_corrections": 3,
+        "opponent_profiles": 1082
+      }
+    },
+    {
+      "source_hours": 4.0,
+      "elapsed_real_seconds": 125.13,
+      "python_current_bytes": 811393,
+      "python_peak_bytes": 1273860,
+      "process_rss_bytes": 80044032,
+      "buffer": {
+        "seconds": 30,
+        "max_frames": 450,
+        "max_bytes": 67108864,
+        "frames": 301,
+        "bytes": 217443,
+        "evicted_frames": 143700,
+        "encoding_failures": 0,
+        "oldest_timestamp": 14370.0,
+        "latest_timestamp": 14400.0
+      },
+      "event_log": 40,
+      "event_keys": 1,
+      "profiles": 128,
+      "identities_created": 1444,
+      "decision_keys": 0,
+      "recent_hands": 20,
+      "archive_rows": {
+        "observed_events": 12486,
+        "observed_hands": 720,
+        "decision_snapshots": 1440,
+        "important_frames": 1444,
+        "manual_corrections": 4,
+        "opponent_profiles": 1443
+      }
+    },
+    {
+      "source_hours": 5.0,
+      "elapsed_real_seconds": 164.25,
+      "python_current_bytes": 815302,
+      "python_peak_bytes": 1278245,
+      "process_rss_bytes": 80084992,
+      "buffer": {
+        "seconds": 30,
+        "max_frames": 450,
+        "max_bytes": 67108864,
+        "frames": 301,
+        "bytes": 217443,
+        "evicted_frames": 179700,
+        "encoding_failures": 0,
+        "oldest_timestamp": 17970.0,
+        "latest_timestamp": 18000.0
+      },
+      "event_log": 40,
+      "event_keys": 1,
+      "profiles": 128,
+      "identities_created": 1805,
+      "decision_keys": 0,
+      "recent_hands": 20,
+      "archive_rows": {
+        "observed_events": 15608,
+        "observed_hands": 900,
+        "decision_snapshots": 1800,
+        "important_frames": 1805,
+        "manual_corrections": 5,
+        "opponent_profiles": 1804
+      }
+    },
+    {
+      "source_hours": 6.0,
+      "elapsed_real_seconds": 210.35,
+      "python_current_bytes": 818739,
+      "python_peak_bytes": 1281510,
+      "process_rss_bytes": 80113664,
+      "buffer": {
+        "seconds": 30,
+        "max_frames": 450,
+        "max_bytes": 67108864,
+        "frames": 301,
+        "bytes": 217443,
+        "evicted_frames": 215700,
+        "encoding_failures": 0,
+        "oldest_timestamp": 21570.0,
+        "latest_timestamp": 21600.0
+      },
+      "event_log": 40,
+      "event_keys": 1,
+      "profiles": 128,
+      "identities_created": 2166,
+      "decision_keys": 0,
+      "recent_hands": 20,
+      "archive_rows": {
+        "observed_events": 18730,
+        "observed_hands": 1080,
+        "decision_snapshots": 2160,
+        "important_frames": 2166,
+        "manual_corrections": 6,
+        "opponent_profiles": 2165
+      }
+    },
+    {
+      "source_hours": 7.0,
+      "elapsed_real_seconds": 260.25,
+      "python_current_bytes": 821612,
+      "python_peak_bytes": 1284477,
+      "process_rss_bytes": 80117760,
+      "buffer": {
+        "seconds": 30,
+        "max_frames": 450,
+        "max_bytes": 67108864,
+        "frames": 301,
+        "bytes": 217443,
+        "evicted_frames": 251700,
+        "encoding_failures": 0,
+        "oldest_timestamp": 25170.0,
+        "latest_timestamp": 25200.0
+      },
+      "event_log": 40,
+      "event_keys": 1,
+      "profiles": 128,
+      "identities_created": 2527,
+      "decision_keys": 0,
+      "recent_hands": 20,
+      "archive_rows": {
+        "observed_events": 21852,
+        "observed_hands": 1260,
+        "decision_snapshots": 2520,
+        "important_frames": 2527,
+        "manual_corrections": 7,
+        "opponent_profiles": 2526
+      }
+    },
+    {
+      "source_hours": 8.0,
+      "elapsed_real_seconds": 309.78,
+      "python_current_bytes": 823711,
+      "python_peak_bytes": 1286522,
+      "process_rss_bytes": 80121856,
+      "buffer": {
+        "seconds": 30,
+        "max_frames": 450,
+        "max_bytes": 67108864,
+        "frames": 301,
+        "bytes": 217443,
+        "evicted_frames": 287700,
+        "encoding_failures": 0,
+        "oldest_timestamp": 28770.0,
+        "latest_timestamp": 28800.0
+      },
+      "event_log": 40,
+      "event_keys": 1,
+      "profiles": 128,
+      "identities_created": 2888,
+      "decision_keys": 0,
+      "recent_hands": 20,
+      "archive_rows": {
+        "observed_events": 24974,
+        "observed_hands": 1440,
+        "decision_snapshots": 2880,
+        "important_frames": 2888,
+        "manual_corrections": 8,
+        "opponent_profiles": 2887
+      }
+    }
+  ],
+  "database": "/reports/soak-ae92ebdeda7647f68683ae5cd1ede7d6.sqlite3",
+  "limits_passed": true,
+  "limitations": "Synthetic 96x54 frames and labeled observations; no OCR, native video, EV solver or browser heap benchmark."
+}

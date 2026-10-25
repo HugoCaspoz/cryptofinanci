@@ -61,6 +61,8 @@ def render_opponent_table(layout, timestamp):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, default=Path("sample_data/opponents-demo.avi"))
+    parser.add_argument("--decision-hold-seconds", type=int, choices=range(5), default=0,
+                        help="Extend the synthetic Hero turn for browser interaction tests (0-4 seconds).")
     args = parser.parse_args()
     layout = LayoutStore().read()[0]
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -68,8 +70,11 @@ def main():
     if not writer.isOpened():
         raise RuntimeError("MJPEG encoder unavailable")
     try:
-        for index in range(DURATION * 5):
-            writer.write(render_opponent_table(layout, index / 5))
+        for index in range((DURATION + args.decision_hold_seconds) * 5):
+            timestamp = index / 5
+            if timestamp >= 52:
+                timestamp = max(52, timestamp - args.decision_hold_seconds)
+            writer.write(render_opponent_table(layout, timestamp))
     finally:
         writer.release()
     print(args.output.resolve())

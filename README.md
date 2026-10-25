@@ -1,8 +1,8 @@
 # Zeros · Poker Lab
 
-Base de una aplicación de análisis de Texas Hold’em a partir de vídeo en directo. La especificación completa y el orden de desarrollo están en [app.md](app.md). **Implementadas: fases 1 a 22. La vista en directo reúne vídeo, mano actual y eventos actualizados por WebSocket. El motor matemático calcula métricas, equity y análisis postflop; el motor preflop aplica tablas configurables con contexto confirmado. El modelo de rivales adapta rangos a las acciones y estadísticas. El contexto de torneo añade buy-in, formato, participantes y premios, con un prior de población opcional que pierde peso frente a los datos. El motor de estrategia combina todo ello en cada decisión de Hero y produce frecuencias baseline y explotativas; el analizador de faroles evalúa fold equity, bloqueadores, valor de showdown y tendencias del rival. Cada turno confirmado de Hero conserva una instantánea inmutable con los datos conocidos entonces y se compara después con la acción tomada. Los resultados se muestran en entrenamiento y se desbloquean en dinero real al terminar la mano o la sesión, según la política guardada. Validado con vídeos sintéticos; falta calibrar y validar una plataforma real.**
+Base de una aplicación de análisis de Texas Hold’em a partir de vídeo en directo. La especificación completa y el orden de desarrollo están en [app.md](app.md). **Implementadas: fases 1 a 30. La vista en directo reúne vídeo, mano actual y eventos actualizados por WebSocket. El motor matemático calcula métricas, equity y análisis postflop; el motor preflop aplica tablas configurables con contexto confirmado. El modelo de rivales adapta rangos a las acciones y estadísticas. El contexto de torneo añade buy-in, formato, participantes y premios, con un prior de población opcional que pierde peso frente a los datos. El motor de estrategia combina todo ello en cada decisión de Hero y produce frecuencias baseline y explotativas; el analizador de faroles evalúa fold equity, bloqueadores, valor de showdown y tendencias del rival. Cada turno confirmado de Hero conserva una instantánea inmutable con los datos conocidos entonces y se compara después con la acción tomada. Los resultados se muestran en entrenamiento y se desbloquean en dinero real al terminar la mano o la sesión, según la política guardada. Validado con vídeos sintéticos; falta calibrar y validar una plataforma real.**
 
-En `/live` puedes reproducir un archivo como stream o compartir una pantalla/ventana mediante el navegador. La previsualización muestra frames recibidos por el backend. El detector reconoce cartas mediante referencias visuales y confirma cambios entre frames. El OCR lee nombres, stacks, apuestas, bote y ciegas, conservando los valores confirmados durante lecturas dudosas. No se garantiza una reconstrucción completa cuando faltan señales; la estrategia preflop exige datos confirmados y coherentes.
+En `/live` puedes reproducir un archivo como stream, compartir una pantalla/ventana o usar la cámara del móvil mediante el navegador. La previsualización muestra frames recibidos por el backend. El detector reconoce cartas mediante referencias visuales y confirma cambios entre frames. El OCR lee nombres, stacks, apuestas, bote y ciegas, conservando los valores confirmados durante lecturas dudosas. No se garantiza una reconstrucción completa cuando faltan señales; la estrategia preflop exige datos confirmados y coherentes.
 
 ## Arranque con Docker
 
@@ -21,7 +21,7 @@ docker compose ps
 - Salud de la API: http://localhost:8000/health
 - WebSocket, a través del frontend: ws://localhost:5173/ws/live
 
-Compose levanta frontend (Nginx), backend (FastAPI) y PostgreSQL con volumen persistente. El backend guarda manos y eventos en PostgreSQL. La agrupación y el análisis de sesiones siguen pendientes. El endpoint de salud indica el tipo de persistencia configurado; los errores de escritura se notifican en la captura.
+Compose levanta frontend (Nginx), backend (FastAPI) y PostgreSQL con volumen persistente. El backend guarda manos y eventos en PostgreSQL. El archivo de sesiones agrupa manos, estadísticas con cobertura y evaluaciones de decisiones en `/sessions`; consulta [fase 30](docs/phase-30.md). El endpoint de salud indica el tipo de persistencia configurado; los errores de escritura se notifican en la captura.
 
 ```powershell
 docker compose logs --tail 100
@@ -33,7 +33,7 @@ docker compose down
 ## Capturar vídeo
 
 1. Abre http://localhost:5173/live en Chrome o Edge.
-2. Selecciona los FPS de captura: 1, 2, **5 por defecto**, 10 o 15.
+2. Usa el muestreo **Inteligente (2/10 FPS)** predeterminado o selecciona una frecuencia fija.
 3. Para un archivo, selecciónalo y pulsa **Reproducir archivo**. Se admiten MP4, MOV, MKV, AVI y WebM hasta 256 MB, siempre que su códec sea compatible con el decodificador.
 4. Para el escritorio, pulsa **Compartir pantalla o ventana** y elige la superficie en el selector del navegador. No se captura audio.
 5. Comprueba la imagen, el contador de frames y el tiempo de fuente. Pulsa **Detener captura** antes de cambiar a otra fuente.
@@ -376,7 +376,7 @@ compose.yaml
 
 Solo se crean módulos que tienen una responsabilidad implementada en esta fase.
 
-## Limitaciones y siguiente fase
+## Limitaciones y validación pendiente
 
 Se guardan manos, eventos, instantáneas y evaluaciones de decisiones, incluidas acciones corroboradas en el perfil sintético. Hay una baseline preflop limitada a contextos confirmados, estrategias postflop heads-up aproximadas y revisión diferida en dinero real; todavía no hay agrupación de varias capturas en sesiones. No se garantiza una hand history completa con señales ausentes, apuestas simultáneas o imágenes sin calibrar. La ilustración de la portada es decorativa. El registro de actividad conserva mensajes de conexión; los paneles de cartas y eventos muestran observaciones y acciones inferidas. La tipografía DM Sans y Manrope se sirve localmente; sus licencias OFL se incluyen en `frontend/public/fonts/`.
 
@@ -386,4 +386,75 @@ La cola, las ventanas de métricas y los frames retenidos están acotados. La pa
 
 El detector inicial requiere cartas claras, completas, verticales y separadas dentro de las zonas configuradas. No está validado para cámaras, cartas inclinadas, dorsos, animaciones ni temas de salas reales. Su historial conserva los últimos 40 eventos por captura en memoria; las lecturas llegan a la interfaz mediante snapshots WebSocket. Una conexión lenta puede omitir snapshots intermedios; el archivo de manos conserva los eventos persistidos.
 
-La siguiente fase prevista es la 23: timeline de decisiones y acceso al frame exacto. La calibración y validación de una plataforma real siguen pendientes; no se ha probado una sesión real de ocho horas ni una entrada de cámara.
+Las fases 23 a 30 incorporan timeline, explicaciones, rendimiento, historial, correcciones y dashboard de sesiones. La calibración y validación de una plataforma real siguen pendientes; no se ha probado una sesión real de ocho horas ni la precisión de una cámara física sobre una mesa real.
+
+
+## Timeline de decisiones (fase 23)
+
+En **Manos → una mano → Revisión de la mano**, la línea temporal ordena las decisiones por calle y tiempo. Al seleccionar una se abre su fotograma, el estado congelado, la acción confirmada y las alternativas del evaluador. Se mantienen las políticas de desbloqueo de la fase 22.
+
+Solo las nuevas decisiones con imagen disponible guardan fotograma: es el frame temporal exacto usado al decidir, comprimido en JPEG y reducido como la previsualización (máximo 1280 × 720). No se conserva el vídeo completo. Las decisiones anteriores siguen siendo revisables sin imagen. Contrato, pruebas y límites en [fase 23](docs/phase-23.md).
+
+
+## Explicar decisiones (fase 24)
+
+En la revisión de una decisión, abre **Entender la decisión**, elige **Simple** o **Avanzado** y pulsa **Generar explicación**. En TRAINING también está disponible junto a la estrategia en directo de un turno congelado de Hero. LIVE_REAL_MONEY mantiene el desbloqueo de la fase 22.
+
+Funciona localmente sin clave. Para activar el editor OpenAI, configura en `.env` `EXPLAINER_PROVIDER=openai`, `OPENAI_API_KEY` y `OPENAI_MODEL` con un modelo de tu cuenta compatible con Responses y Structured Outputs; aplica con `docker compose up -d`. No pongas la clave en el frontend. El proveedor solo se consulta al pulsar el botón y en fallos se conserva una explicación local. Los resultados correctos se reutilizan desde una caché persistente.
+
+El LLM organiza frases verificables del motor; no redacta libremente acciones ni cifras, no calcula estrategia y no recibe vídeo ni nombres de rivales. Configuración, contrato y pruebas en [fase 24](docs/phase-24.md).
+
+
+## Sesiones largas (fase 29)
+
+La captura mantiene acotados eventos, claves de decisión, perfiles y colas; los perfiles inactivos antiguos se archivan sin detener la sesión. Se guardan imágenes seleccionadas de límites de mano y errores, además de los frames de decisiones y correcciones existentes. Los frames normales permanecen solo en el buffer temporal.
+
+La depuración muestra RSS y contadores de retención. Se verificaron 8 horas sintéticas aceleradas de tiempo de fuente y una prueba corta del pipeline con reloj real; esto no certifica ocho horas reales de OCR y navegador. Resultados medidos, informes, comandos, API y límites en [fase 29](docs/phase-29.md). El dashboard está disponible desde la [fase 30](docs/phase-30.md).
+
+## Corrección manual (fase 28)
+
+En `/live`, «Corrección manual» permite pausar el análisis, corregir cartas, board, jugador, stack, apuesta y acción, guardar el ajuste y reanudar la misma captura. Cada corrección conserva la observación, el estado anterior y posterior y la imagen del frame como dataset persistente, exportable en JSON con imágenes por separado.
+
+Los fallos de almacenamiento dejan el estado intacto y pausado. Las decisiones archivadas no se reescriben; el historial estratégico afectado requiere reconfirmación. En archivos se congela el reloj de reproducción; una pantalla real sigue avanzando y puede perder acciones durante la pausa. Ejecución, archivos, API, pruebas y límites en [fase 28](docs/phase-28.md). La validación de sesiones largas está documentada en la fase 29.
+
+## Buffer temporal (fase 27)
+
+La captura conserva un historial circular de los últimos 10 segundos de imágenes, antes del muestreo y la cola de procesamiento. `FRAME_BUFFER_SECONDS` permite configurar entre 10 y 30 segundos, con límites adicionales de 450 frames y 64 MiB de JPEG. En `/live`, «Historial temporal de imágenes» permite actualizar la lista y seleccionar un frame por su ID y tiempo de fuente.
+
+La API permite consultar el ID exacto o el último frame anterior a un instante, sin volver a analizar ni modificar la partida. El historial se sustituye con cada captura y no persiste al reiniciar. Ejecución, archivos, contratos, pruebas y límites en [fase 27](docs/phase-27.md). Las correcciones manuales están disponibles desde la fase 28.
+
+## Muestreo inteligente (fase 26)
+
+En `/live`, el selector de FPS incluye «Inteligente: 2 / 10 FPS», seleccionado inicialmente. Un filtro visual ligero inspecciona hasta 10 imágenes por segundo y envía al reconocimiento 2 FPS en reposo. Los cambios en regiones de la mesa activan una ráfaga de hasta 10 FPS durante dos segundos desde el último cambio. Los FPS fijos siguen disponibles.
+
+La depuración muestra el objetivo actual y los frames omitidos antes del OCR. La captura y subida de pantalla siguen activas hasta 10 FPS; el ahorro depende de la escena y afecta al trabajo posterior al filtro. La cola limitada sigue protegiendo al procesador. Contratos de API, archivos, pruebas, ejecución y límites en [fase 26](docs/phase-26.md). El buffer circular está disponible desde la fase 27.
+
+## Latencias por etapa (fase 25)
+
+En `/live`, abre **Depuración del pipeline → Latencias por etapa**. La tabla separa captura/decodificación, visión con OCR, preparación JPEG, estado, persistencia/publicación, motores de análisis y tiempo total del backend. Cada fila muestra su frame, último valor, media y P95 de hasta 128 muestras. Los objetivos P95 son visión <200 ms, estado <50 ms e interfaz <100 ms; se indica si se superan, sin prometer cumplirlos en todas las máquinas.
+
+La interfaz se mide aparte, desde recibir el snapshot WebSocket hasta una aproximación del pintado en una pestaña visible. No se suman relojes del navegador y servidor ni análisis que corren en paralelo. El total backend no incluye captura/codificación en el navegador, subida, transporte WebSocket o descarga de la imagen. Definiciones, pruebas y límites en [fase 25](docs/phase-25.md).
+
+## Dashboard de sesiones (fase 30)
+
+En `/sessions` se listan las capturas persistidas del modo actual. El resumen final muestra manos, cobertura de Hero, VPIP/PFR/3-bet sobre oportunidades completas, EV estimada no capturada, rankings de decisiones, posibles faroles y perfiles rivales paginados. El TOP 10 abre directamente el snapshot, fotograma y explicador de la mano. En dinero real exige confirmar expresamente el fin de juego y se oculta de nuevo al activarse una mano.
+
+Los valores sin cobertura aparecen como no disponibles; la EV procede del modelo archivado y no mide una pérdida monetaria real. Definiciones, archivos, permisos y validación en [fase 30](docs/phase-30.md). Se han implementado las 30 fases; queda validar una plataforma real.
+
+## Cámara del móvil en directo
+
+En **En directo → Usar cámara** puedes enviar imágenes sin audio desde el móvil al ordenador. Para acceder desde otro dispositivo en la misma red, ejecuta `powershell -ExecutionPolicy Bypass -File scripts/Start-Mobile.ps1`: prepara HTTPS local con contraseña y deja direcciones, certificado y credenciales en `.mobile/access.txt` (ignorado por Git). El móvil necesita instalar y confiar en el certificado de esta instalación.
+
+Si Windows bloquea la conexión, ejecuta el script como administrador con `-ConfigureFirewall`. No es necesario abrir puertos del router. Mantén el móvil fijo, horizontal y con la pestaña visible; calibra las regiones sobre la imagen recibida. La cámara se detiene al ocultar la pestaña o pulsar Detener captura. [Guía completa, archivos y validación](docs/mobile-camera.md); también disponible desde la app en `/mobile-setup.html`.
+
+## Railway
+
+Aplicación desplegada: https://poker-production-d993.up.railway.app/live. Usuario y contraseña en `.railway-local/access.txt` (excluido de Git). Desde el móvil puedes usar la cámara con HTTPS sin instalar certificados locales ni mantener el PC encendido.
+
+La instancia utiliza PostgreSQL y calibración persistente propios; el historial del ordenador no se ha migrado. Infraestructura, validación y actualizaciones con `npm run deploy` en [la guía de Railway](docs/railway.md).
+
+## Correcciones 0.30.1
+
+La revisión del 25 de octubre incorpora login por sesión, geometría de captura adaptable, perfiles de cartas importables, asientos vacíos, preparación móvil compacta y exportación/borrado/restauración de sesiones. [Cambios, uso, pruebas y límites pendientes](docs/repairs-2026-10-25.md).
+
+La copia del despliegue se repite con `powershell -ExecutionPolicy Bypass -File scripts/Backup-Railway.ps1`; las copias programadas de Railway requieren Pro y no han quedado activadas. `scripts/Snapshot-Source.ps1` crea un historial local independiente sin tocar el remoto actual. El workflow CI está preparado para el repositorio correcto.

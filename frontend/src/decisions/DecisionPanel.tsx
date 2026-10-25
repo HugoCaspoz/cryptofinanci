@@ -1,3 +1,4 @@
+import { ExplanationPanel } from "../explanations/ExplanationPanel";
 import { useEffect, useState } from "react";
 import { useCapture } from "../capture/CaptureProvider";
 import { readResponse } from "../capture/types";
@@ -179,6 +180,10 @@ export function DecisionPanel() {
                 Ver JSON completo de la instantánea
               </a>
               <EvaluationReview key={detail.id} identity={detail.id} />
+              <ExplanationPanel
+                key={`explanation:${detail.id}`}
+                identity={detail.id}
+              />
             </article>
           )}
         </>

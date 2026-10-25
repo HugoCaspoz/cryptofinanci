@@ -1,10 +1,11 @@
+import type { LatencySummary } from "../live/latency";
 import { useCapture } from "./CaptureProvider";
 
 const ms = (value: number | null | undefined) =>
   value == null ? "—" : `${value.toFixed(1)} ms`;
 
 export function PipelineDebug() {
-  const { capture, available } = useCapture();
+  const { capture, available, uiLatency } = useCapture();
   const metrics = capture.pipeline;
   return (
     <details className="panel pipeline-debug">
@@ -19,6 +20,29 @@ export function PipelineDebug() {
         </span>
       </summary>
       <div className="debug-body">
+        {capture.session_health?.archive_error && (
+          <p role="alert">{capture.session_health.archive_error}</p>
+        )}
+        {capture.session_health && (
+          <p data-testid="session-health">
+            Memoria del proceso:{" "}
+            {capture.session_health.process_rss_bytes == null
+              ? "No disponible"
+              : `${(capture.session_health.process_rss_bytes / 1048576).toFixed(1)} MiB RSS`}{" "}
+            · Tiempo de fuente:{" "}
+            {(capture.session_health.source_seconds / 3600).toFixed(2)} h ·
+            Imágenes importantes guardadas:{" "}
+            {capture.session_health.important_frames_saved} · Perfiles en
+            memoria: {capture.session_health.retained.opponent_profiles} /{" "}
+            {capture.session_health.limits.opponent_profiles}.
+          </p>
+        )}
+
+        <p>
+          {metrics?.sampling?.mode === "adaptive"
+            ? `Muestreo inteligente: ${metrics.sampling.target_fps} FPS · ${metrics.sampling.skipped_frames} frames omitidos antes del OCR.`
+            : "Muestreo fijo"}
+        </p>
         <p>Captura → Cola limitada → Procesamiento → Observaciones</p>
         {!available && (
           <p role="alert">
@@ -28,11 +52,14 @@ export function PipelineDebug() {
         )}
         <div className="debug-grid">
           <div>
-            <span>FPS de captura reales</span>
+            <span>FPS enviados al procesamiento</span>
             <strong data-testid="capture-fps">
               {metrics?.capture_fps.toFixed(1) ?? "—"}
             </strong>
-            <small>Objetivo: {capture.capture_fps} FPS</small>
+            <small>
+              Objetivo: {metrics?.sampling?.target_fps ?? capture.capture_fps}{" "}
+              FPS
+            </small>
           </div>
           <div>
             <span>FPS de procesamiento</span>
@@ -89,6 +116,89 @@ export function PipelineDebug() {
             </small>
           </div>
         </div>
+        <h3>Latencias por etapa</h3>
+        <p>
+          Último valor, media y P95 de hasta 128 muestras por etapa. Objetivos
+          de ingeniería, no garantías.
+        </p>
+        <div className="latency-table-scroll">
+          <table className="latency-table" aria-label="Latencias por etapa">
+            <thead>
+              <tr>
+                <th>Etapa</th>
+                <th>Última</th>
+                <th>Media</th>
+                <th>P95</th>
+                <th>Muestras</th>
+                <th>Frame</th>
+                <th>Objetivo P95</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(
+                [
+                  ["capture", "Captura / decodificación"],
+                  ["vision", "Visión (incluye OCR)"],
+                  ["preview", "Preparar imagen"],
+                  ["state", "Actualizar estado"],
+                  ["publish", "Preparar estado y guardar"],
+                  ["total_backend", "Total backend hasta estado listo"],
+                  ["equity", "Motor matemático"],
+                  ["strategy", "Motor de estrategia"],
+                  ["equity_total", "Hasta análisis matemático"],
+                  ["strategy_total", "Hasta estrategia archivada"],
+                  ["ui", "Interfaz: recepción a render"],
+                ] as const
+              ).map(([name, label]) => {
+                const value: LatencySummary | null | undefined =
+                  name === "ui" ? uiLatency : metrics?.latencies?.[name];
+                return (
+                  <tr key={name} data-testid={`latency-${name}`}>
+                    <th scope="row">{label}</th>
+                    <td>{ms(value?.last_ms)}</td>
+                    <td>{ms(value?.mean_ms)}</td>
+                    <td>{ms(value?.p95_ms)}</td>
+                    <td>{value?.samples ?? 0}</td>
+                    <td>{value?.frame_id ?? "—"}</td>
+                    <td>
+                      {value?.target_ms == null ? (
+                        "—"
+                      ) : (
+                        <span
+                          className={
+                            value.within_target == null
+                              ? ""
+                              : value.within_target
+                                ? "latency-ok"
+                                : "latency-over"
+                          }
+                        >
+                          &lt; {value.target_ms} ms
+                          {value.within_target == null
+                            ? " · Sin muestras"
+                            : value.within_target
+                              ? " · Cumple"
+                              : " · Superado"}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <p className="debug-footnote">
+          El estado está incluido en publicación. Los análisis son asíncronos y
+          pueden pertenecer a otro frame; no se suman al total. Los tiempos del
+          navegador y servidor se muestran por separado.
+        </p>
+        <p className="debug-footnote">
+          La captura mide lectura/decodificación en el backend: no incluye la
+          selección de pantalla, codificación del navegador ni subida. La medida
+          UI aproxima un pintado tras recibir el snapshot, sin medir red ni la
+          descarga JPEG. Solo se muestrean pestañas visibles.
+        </p>
         <p className="debug-footnote">
           Contadores por captura. Descartados al parar:{" "}
           {metrics?.discarded_frames ?? 0}. Los FPS requieren un segundo de

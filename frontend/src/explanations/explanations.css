@@ -1,0 +1,30 @@
+.explanation-panel {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #344235;
+}
+.explanation-controls {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 16px 0;
+}
+.explanation-controls label {
+  display: grid;
+  gap: 8px;
+}
+.explanation-controls select {
+  color: inherit;
+  background: #1a231b;
+  border: 1px solid #46523e;
+  border-radius: 8px;
+  padding: 10px;
+}
+.explanation-source {
+  color: var(--accent, #b2e676);
+  font-size: 0.85rem;
+}
+.explanation-panel p {
+  overflow-wrap: anywhere;
+}

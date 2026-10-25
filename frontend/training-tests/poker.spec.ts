@@ -1,3 +1,4 @@
+import { openLiveTools } from "../tests/openLiveTools";
 import { expect, test } from "@playwright/test";
 import { resolve } from "node:path";
 
@@ -16,6 +17,7 @@ for (const mobile of [false, true]) {
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
     await page.goto("/live");
+  await openLiveTools(page);
     await page
       .getByLabel("Archivo de vídeo")
       .setInputFiles(resolve("../sample_data/ocr-demo.avi"));

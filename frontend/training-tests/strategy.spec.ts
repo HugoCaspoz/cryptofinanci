@@ -1,3 +1,4 @@
+import { openLiveTools } from "../tests/openLiveTools";
 import { expect, test } from "@playwright/test";
 import { resolve } from "node:path";
 
@@ -10,6 +11,7 @@ test("strategy and bluff analysis show only while Hero decides and archive the d
   page.on("pageerror", (e) => errors.push(e.message));
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/live");
+  await openLiveTools(page);
   const opponents = page.getByRole("region", { name: "Modelo de rivales" });
   const strategy = page.getByRole("region", { name: "Motor de estrategia" });
   await expect(strategy).toContainText("Entrenamiento");
@@ -21,6 +23,18 @@ test("strategy and bluff analysis show only while Hero decides and archive the d
     await expect(page.getByTestId("current-pot")).toHaveText("150", {
       timeout: 12000,
     });
+    const identity = (await (await request.get("/api/capture")).json())
+      .capture_id;
+    await expect
+      .poll(async () => {
+        const frames = await (
+          await request.get(`/api/capture/${identity}/important-frames`)
+        ).json();
+        return frames.items.some(
+          (frame: { kind: string }) => frame.kind === "hand_started",
+        );
+      })
+      .toBe(true);
     for (const seat of [3, 4, 5, 6])
       await opponents.getByLabel(`Estadísticas asiento ${seat}`).uncheck();
     await opponents.getByLabel("Botón para estadísticas").selectOption("1");
@@ -84,6 +98,27 @@ test("strategy and bluff analysis show only while Hero decides and archive the d
     expect(
       frozen.actions.some((a: { type: string }) => a.type === "PLAYER_FOLDED"),
     ).toBe(false);
+    const explanation = strategy.getByRole("region", {
+      name: "Explicación de la decisión",
+    });
+    await explanation
+      .getByRole("button", { name: "Generar explicación", exact: true })
+      .click();
+    await expect(explanation.getByTestId("decision-explanation")).toContainText(
+      "Explicación local",
+    );
+    await expect(explanation.getByTestId("decision-explanation")).toContainText(
+      "Baseline",
+    );
+    const telemetry = (await (await request.get("/api/capture")).json())
+      .pipeline.latencies;
+    expect(telemetry.strategy.samples).toBeGreaterThan(0);
+    expect(telemetry.equity.samples).toBeGreaterThan(0);
+    expect(telemetry.strategy_total.frame_id).toBe(current.result.frame_id);
+    await info.attach("latency-metrics", {
+      body: JSON.stringify(telemetry, null, 2),
+      contentType: "application/json",
+    });
     const summary = current.result.baseline_strategy.summary;
     expect(
       Object.values(summary).reduce((a, b) => (a as number) + (b as number), 0),
@@ -119,6 +154,10 @@ test("strategy and bluff analysis show only while Hero decides and archive the d
     await expect(evaluation).toContainText("Acción de Hero: Fold", {
       timeout: 15000,
     });
+    await expect(evaluation).toHaveCount(1);
+    await expect(
+      detail.getByRole("region", { name: "Explicación de la decisión" }),
+    ).toHaveCount(1);
     await expect(evaluation).toContainText("Diferencia de EV:");
     await expect(evaluation).toContainText("Confianza limitada");
     const comparison = await (
@@ -142,6 +181,7 @@ test("strategy and bluff analysis show only while Hero decides and archive the d
     expect(comparison.result.strategy_result.timestamp).toBe(frozen.timestamp);
     expect(comparison.result.confidence.value).toBeNull();
     await page.reload();
+    await openLiveTools(page);
     await decisions
       .getByRole("button", { name: /Ver decisión · flop/ })
       .click();

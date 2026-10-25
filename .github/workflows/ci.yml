@@ -1,0 +1,54 @@
+name: Validate Poker Lab
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: zeros
+          POSTGRES_PASSWORD: isolated_ci_tests
+          POSTGRES_DB: poker_checks
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U zeros -d poker_checks"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Build backend and test image
+        run: |
+          docker build -t zeros-backend backend
+          docker build -t zeros-backend-tests -f backend/Dockerfile.test backend
+      - name: Backend and PostgreSQL tests
+        run: docker run --rm --network host -e HAND_TEST_POSTGRES=postgresql://zeros:isolated_ci_tests@127.0.0.1:5432/poker_checks zeros-backend-tests
+      - name: Install and build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+          npx playwright install --with-deps chromium
+      - name: Start isolated browser fixture
+        run: |
+          docker run --rm -d --name fixture -p 8000:8000 zeros-backend-tests python scripts/seed_timeline_review.py --serve
+          for n in $(seq 1 30); do curl -fsS http://127.0.0.1:8000/health && break; sleep 1; done
+          cd frontend
+          node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5173 > /tmp/zeros-vite.log 2>&1 &
+      - name: Browser regression tests
+        working-directory: frontend
+        env:
+          E2E_BASE_URL: http://127.0.0.1:5173
+          CAMERA_E2E: "1"
+          LATENCY_E2E: "1"
+          TIMELINE_E2E: "1"
+        run: node node_modules/@playwright/test/cli.js test tests/app.spec.ts tests/audit-fixes.spec.ts tests/camera.spec.ts tests/corrections.spec.ts tests/history.spec.ts tests/latency.spec.ts tests/sampling.spec.ts tests/sessions.spec.ts tests/timeline.spec.ts --workers=1

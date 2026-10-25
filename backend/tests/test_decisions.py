@@ -179,6 +179,7 @@ def test_capture_links_frozen_strategy_and_keeps_event_stream_contiguous(tmp_pat
         game.last_observation = SimpleNamespace(frame_id=100, source_timestamp=100, recognition_available=True)
         capture.opponents.model = s.model
         capture.poker.configure(POKER)
+        capture.preview = ({"frame_id": 100, "timestamp": 100.}, b"exact-frame")
         capture._analyze()
         await capture.decisions.task
         await capture.strategy.task
@@ -186,6 +187,7 @@ def test_capture_links_frozen_strategy_and_keeps_event_stream_contiguous(tmp_pat
         assert snapshot and capture.decisions.count == 1
         assert capture.strategy.result["decision_snapshot_id"] == snapshot.id
         original = store.get_decision(snapshot.id)
+        assert store.get_decision_frame(snapshot.id) == b"exact-frame"
         assert s.model.cursor == game.event_engine.replay.sequence
         assert game.event_engine.events[-1].type == "HERO_DECISION_REQUIRED"
         capture.strategy.configure(StrategyConfig(temperature=.2))

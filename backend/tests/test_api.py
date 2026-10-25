@@ -15,7 +15,7 @@ def client():
 def test_health_and_empty_sessions(client):
     assert client.get("/health").json()["mode"] == "LIVE_REAL_MONEY"
     assert client.get("/api/sessions").json() == {
-        "items": [], "total": 0, "persistence": "not_implemented",
+        "items": [], "total": 0, "persistence": "sqlite", "offset": 0,
     }
     assert client.get("/api/sessions/missing").status_code == 404
 
@@ -27,7 +27,7 @@ def test_websocket_handshake_and_ping(mode):
             ready = ws.receive_json()
             assert ready["type"] == "system.ready"
             assert ready["payload"] == {
-                "mode": mode, "phase": 22,
+                "mode": mode, "phase": 30,
                 "capture_available": True, "strategy_available": mode == Mode.TRAINING,
             }
             ws.send_json({"type": "ping"})

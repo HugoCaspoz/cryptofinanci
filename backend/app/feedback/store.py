@@ -12,23 +12,36 @@ class FeedbackStore:
             status TEXT NOT NULL, created_at TEXT NOT NULL, finished_at TEXT)""")
         db.execute("""CREATE TABLE IF NOT EXISTS review_session_events (
             scope_id TEXT PRIMARY KEY, payload TEXT NOT NULL)""")
+        db.execute("CREATE INDEX IF NOT EXISTS review_session_mode_index ON review_sessions(mode,created_at,scope_id)")
         db.execute("UPDATE review_sessions SET status='interrupted' WHERE status='capturing'")
         # Existing archives have no release policy: migrate conservatively, never auto-unlock.
-        rows = db.execute("""SELECT h.scope_id,h.payload FROM observed_hands h WHERE NOT EXISTS
-            (SELECT 1 FROM review_sessions s WHERE s.scope_id=h.scope_id)""").fetchall()
-        grouped = {}
-        for scope, payload in rows:
-            context = json.loads(payload).get("context", {})
-            grouped.setdefault(scope, []).append(context)
-        p = self.marker
-        for scope, contexts in grouped.items():
-            modes = {c.get("mode") for c in contexts}
-            if len(modes) != 1 or next(iter(modes)) not in set(Mode):
-                continue
-            db.execute(f"""INSERT INTO review_sessions(scope_id,capture_id,mode,release_policy,status,created_at)
-                VALUES ({p},{p},{p},{p},'interrupted',{p}) ON CONFLICT(scope_id) DO NOTHING""",
-                (scope, contexts[0].get("capture_id"), next(iter(modes)), FeedbackRelease.SESSION_FINISHED,
-                 datetime.now(timezone.utc).isoformat()))
+        p, cursor = self.marker, ""
+        while True:
+            scopes = db.execute(f"""SELECT DISTINCT h.scope_id FROM observed_hands h
+                WHERE h.scope_id>{p} AND NOT EXISTS (SELECT 1 FROM review_sessions s WHERE s.scope_id=h.scope_id)
+                ORDER BY h.scope_id LIMIT 100""", (cursor,)).fetchall()
+            if not scopes:
+                break
+            for (scope,) in scopes:
+                hand_cursor, first, mixed = "", None, False
+                while True:
+                    rows = db.execute(f"SELECT hand_id,payload FROM observed_hands WHERE scope_id={p} AND hand_id>{p} ORDER BY hand_id LIMIT 100",
+                                      (scope, hand_cursor)).fetchall()
+                    if not rows:
+                        break
+                    for _, payload in rows:
+                        context = json.loads(payload).get("context", {})
+                        if first is None:
+                            first = context
+                        elif context.get("mode") != first.get("mode"):
+                            mixed = True
+                    hand_cursor = rows[-1][0]
+                if first is not None and not mixed and first.get("mode") in set(Mode):
+                    db.execute(f"""INSERT INTO review_sessions(scope_id,capture_id,mode,release_policy,status,created_at)
+                        VALUES ({p},{p},{p},{p},'interrupted',{p}) ON CONFLICT(scope_id) DO NOTHING""",
+                        (scope, first.get("capture_id"), first["mode"], FeedbackRelease.SESSION_FINISHED,
+                         datetime.now(timezone.utc).isoformat()))
+            cursor = scopes[-1][0]
 
     def start_review_session(self, scope, capture_id, mode, release):
         p = self.marker
@@ -69,8 +82,13 @@ class FeedbackStore:
             row = db.execute(f"SELECT scope_id,status,payload FROM observed_hands WHERE hand_id={self.marker}", (hand_id,)).fetchone()
             if row is None:
                 return None
-            events = db.execute(f"SELECT payload FROM observed_events WHERE hand_id={self.marker} AND payload LIKE {self.marker}",
-                                (hand_id, '%HAND_FINISHED%')).fetchall()
-        confirmed = any(json.loads(e[0])["type"] == "HAND_FINISHED" for e in events)
+            confirmed, cursor = False, 0
+            while not confirmed:
+                events = db.execute(f"SELECT sequence,payload FROM observed_events WHERE hand_id={self.marker} AND sequence>{self.marker} ORDER BY sequence LIMIT 100",
+                                    (hand_id, cursor)).fetchall()
+                if not events:
+                    break
+                confirmed = any(json.loads(e[1])["type"] == "HAND_FINISHED" for e in events)
+                cursor = events[-1][0]
         return {"scope_id": row[0], "status": row[1], "mode": json.loads(row[2]).get("context", {}).get("mode"),
                 "finished_confirmed": confirmed, "session": self.review_session(row[0])}

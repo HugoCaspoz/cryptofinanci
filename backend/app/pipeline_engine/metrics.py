@@ -1,8 +1,9 @@
 import time
-from collections import deque
+from collections import deque, OrderedDict
 from typing import Callable
 
 from .frame_queue import FrameQueue
+from .latency import LatencyWindow
 
 
 class PipelineMetrics:
@@ -24,6 +25,23 @@ class PipelineMetrics:
         self._latencies: deque[float] = deque(maxlen=self.MAX_LATENCY_SAMPLES)
         self.queue_wait_ms: float | None = None
         self.frame_latency_ms: float | None = None
+        self.latencies = {name: LatencyWindow(target) for name, target in {
+            "capture": None, "vision": 200, "preview": None, "state": 50, "publish": None,
+            "equity": None, "strategy": None, "total_backend": None,
+            "equity_total": None, "strategy_total": None}.items()}
+        self.origins = OrderedDict()
+
+    def record_origin(self, frame_id, captured_at, capture_ms):
+        self.latencies["capture"].add(capture_ms, frame_id)
+        self.origins[frame_id] = captured_at - capture_ms / 1000
+        if len(self.origins) > self.MAX_LATENCY_SAMPLES:
+            self.origins.popitem(last=False)
+
+    def record_analysis(self, kind, frame_id, milliseconds, finished_at):
+        self.latencies[kind].add(milliseconds, frame_id)
+        origin = self.origins.get(frame_id)
+        if origin is not None:
+            self.latencies[kind + "_total"].add((finished_at - origin) * 1000, frame_id)
 
     def record_capture(self) -> None:
         self.captured_frames += 1
@@ -48,6 +66,7 @@ class PipelineMetrics:
         now = self.clock()
         return {
             "active": self.active,
+            "latencies": {name: window.snapshot() for name, window in self.latencies.items()},
             "window_seconds": self.WINDOW_SECONDS,
             "capture_fps": self._fps(self._captures, now),
             "processing_fps": self._fps(self._processed, now),

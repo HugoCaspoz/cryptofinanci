@@ -22,9 +22,11 @@ class Frame:
     image: np.ndarray  # BGR image at capture resolution.
     fps: float  # Configured sampling rate, not measured throughput.
     captured_at: float = field(default_factory=time.monotonic)  # Backend availability clock.
+    capture_latency_ms: float | None = None  # Decode/adapter work, excluding browser/network.
 
 
 class VideoSource(ABC):
+    sampling_mode: str = "fixed"
     kind: str
     name: str
     capture_fps: float

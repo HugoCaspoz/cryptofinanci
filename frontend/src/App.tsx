@@ -5,6 +5,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { Live } from "./pages/Live";
 import { Sessions, SessionDetail, NotFound } from "./pages/Sessions";
 import { Hands, HandDetail } from "./hands/Hands";
+import { SessionAccess } from "./components/SessionAccess";
 
 export function App() {
   return (
@@ -15,7 +16,7 @@ export function App() {
           <span className="brand-dot">.</span>
         </NavLink>
         <div className="workspace-label">
-          POKER LAB <span>v0.22</span>
+          POKER LAB <span>v0.30.1</span>
         </div>
         <nav aria-label="Navegación principal">
           <NavLink to="/" end>
@@ -38,9 +39,9 @@ export function App() {
         </nav>
         <div className="sidebar-bottom">
           <div className="build-note">
-            <span className="small-label">EN CONSTRUCCIÓN</span>
+            <span className="small-label">ARCHIVO Y REVISIÓN</span>
             <strong>Una base para cada mano.</strong>
-            <p>Fase 22 de 30 · Feedback según modo</p>
+            <p>Fase 30 de 30 · Dashboard de sesiones</p>
             <div className="progress-track">
               <span />
             </div>
@@ -58,6 +59,7 @@ export function App() {
         <header className="topbar">
           <span>Tu juego, con perspectiva.</span>
           <Connection />
+          <SessionAccess />
         </header>
         <main>
           <Routes>

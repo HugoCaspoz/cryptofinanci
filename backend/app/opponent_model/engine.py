@@ -15,11 +15,14 @@ ACTIONS = {"PLAYER_FOLDED": "FOLD", "PLAYER_CHECKED": "CHECK", "PLAYER_CALLED": 
 
 
 class OpponentModel:
+    MAX_PROFILES = 128
+
     def __init__(self, scope_id):
         self.scope_id = scope_id
         self.cursor = self.revision = self.frame_id = 0
         self.timestamp = 0
         self.profiles, self.active = {}, {}
+        self.identities_created = 0
         self.hand = None
         self.pending_showdowns = []
         self.coverage = "Confirma el inicio de una mano para estadísticas con contexto."
@@ -35,9 +38,12 @@ class OpponentModel:
                 profile = None
                 changed = True
             if profile is None:
-                if len(self.profiles) >= 128:
-                    raise ValueError("Demasiados cambios de identidad; inicia una nueva captura.")
-                key = f"{self.scope_id}:{player.seat}:{len(self.profiles) + 1}"
+                if len(self.profiles) >= self.MAX_PROFILES:
+                    pinned = {identity for item in self.pending_showdowns for identity in item["profiles"].values()}
+                    victim = next(k for k, p in self.profiles.items() if not p["active"] and k not in pinned)
+                    del self.profiles[victim]
+                self.identities_created += 1
+                key = f"{self.scope_id}:{player.seat}:{self.identities_created}"
                 profile = {"id": key, "seat": player.seat, "nickname": player.nickname,
                            "active": True, "hands": 0, "last_hand": None, "actions": 0,
                            "counts": {s: [0, 0] for s in STATS}, "aggressive": 0, "calls": 0}
@@ -80,6 +86,10 @@ class OpponentModel:
             raise ValueError("Confirma ambas ciegas antes de registrar el contexto.")
         initial = replay(context, (), small / big)
         for seat, player in players.items():
+            if seat not in context.seats:
+                if amount(player.current_bet) not in {None, Decimal(0)}:
+                    raise ValueError("Hay una apuesta en un asiento excluido; revisa los participantes.")
+                continue
             expected = initial.bets.get(seat, Decimal(0)) * big
             if (amount(player.current_bet) != expected or player.bet_unit != state.blinds_unit
                     or seat in context.seats and (amount(player.stack) is None or amount(player.stack) <= 0
@@ -139,6 +149,10 @@ class OpponentModel:
     def check_bets(self, event, bets):
         h = self.hand
         for p in event.state_after.players:
+            if p.seat not in h["context"].seats:
+                if amount(p.current_bet) not in {None, Decimal(0)}:
+                    raise ValueError("Hay una apuesta fuera de los participantes confirmados.")
+                continue
             if amount(p.current_bet) != bets.get(p.seat, Decimal(0)) * h["big"] or p.bet_unit != h["unit"]:
                 raise ValueError("Las apuestas no coinciden con las acciones observadas; faltan datos de la mano.")
 
@@ -232,7 +246,7 @@ class OpponentModel:
         h = self.hand
         if not h or event.hand_id != h["id"]:
             return
-        if event.type == "CAPTURE_ENDED":
+        if event.type in {"CAPTURE_ENDED", "MANUAL_CORRECTION", "ANALYSIS_RESUMED"}:
             self.invalidate("Captura interrumpida: no se da por terminada la mano ni se infiere showdown.")
             return
         if not h["valid"]:
@@ -309,7 +323,9 @@ class OpponentModel:
             profiles.append({k: p[k] for k in ("id", "seat", "nickname", "active", "hands", "actions")} | {"stats": stats})
         return {"scope_id": self.scope_id, "revision": self.revision, "event_sequence": self.cursor,
                 "frame_id": self.frame_id, "timestamp": self.timestamp, "coverage": self.coverage,
-                "profiles": profiles, "context": self.hand["context"].model_dump(mode="json") if self.hand else None,
+                "profiles": profiles, "profile_limit": self.MAX_PROFILES,
+                "identities_created": self.identities_created,
+                "evicted_profiles": self.identities_created - len(self.profiles), "context": self.hand["context"].model_dump(mode="json") if self.hand else None,
                 "context_valid": bool(self.hand and self.hand["valid"]),
                 "adaptive": self.hand["ranges"].snapshot(self.hand["valid"], self.hand["finished"]) if self.hand else None,
                 "pending_showdowns": [{"hand_id": r["hand_id"], "seats": r["remaining"]} for r in self.pending_showdowns]}
